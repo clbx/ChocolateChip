@@ -7,7 +7,7 @@ LIBS = -lsfml-audio -lsfml-graphics -lsfml-window -lsfml-system
 CXXFLAGS = -Wall -std=c++11 $(INCLUDE_LOCATION) $(LIB_LOCATION) $(LIBS)
 
 default:
-	$(CXX) -g src/*.cpp $(CXXFLAGS) -o "chip8"
+	$(CXX) -g src/*.cpp $(CXXFLAGS) -o "chocolate"
 
 clean:
 	rm -f chip8
