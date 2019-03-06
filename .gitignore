@@ -33,3 +33,6 @@
 
 
 *.dSYM/
+
+chocolate
+tests
