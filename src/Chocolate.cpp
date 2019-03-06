@@ -1,10 +1,10 @@
-#include "Chip8.hpp"
+#include "Chocolate.hpp"
 
 #include <cstdlib>
 #include <cstdio>
 #include <cstring>
 
-Chip8::Chip8(const char gameFile[])
+Chocolate::Chocolate(const char gameFile[])
 {
 	reset();
 
@@ -18,7 +18,12 @@ Chip8::Chip8(const char gameFile[])
 	//	printf("(%d) %04X ", i, memory[i] << 8 | memory[i+1]);
 }
 
-void Chip8::reset()
+Chocolate::Chocolate() //For Testing Purposes Only
+{
+	reset();
+}
+
+void Chocolate::reset()
 {
 	memset(memory, 0, sizeof(memory));
 	memset(registers, 0, sizeof(registers));
@@ -38,7 +43,7 @@ void Chip8::reset()
 
 }
 
-void Chip8::tick()
+void Chocolate::tick()
 {
 
 	printf("[%03X] ", programCounter);
@@ -55,23 +60,23 @@ void Chip8::tick()
 
 }
 
-bool Chip8::getPixel(int x, int y)
+bool Chocolate::getPixel(int x, int y)
 {
 	return pixels[x][y];
 }
 
-void Chip8::setKey(int key, bool isPressed)
+void Chocolate::setKey(int key, bool isPressed)
 {
 	keyStates[key] = isPressed;
 }
 
-bool Chip8::getKey(int key){
+bool Chocolate::getKey(int key){
 	if(keyStates[key] != 0)
 		return 1;
 	return 0;
 }
 
-bool Chip8::isBuzzer()
+bool Chocolate::isBuzzer()
 {
 	return buzzer;
 }

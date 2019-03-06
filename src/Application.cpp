@@ -2,7 +2,7 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
 
-#include "Chip8.hpp"
+#include "Chocolate.hpp"
 
 int convertKeycode(sf::Keyboard::Key);
 
@@ -43,7 +43,7 @@ int main()
 		keyState[i] = false;
 
 	// Create the CHIP-8 emulator
-	Chip8 chip8(rom);
+	Chocolate chip8(rom);
 
 	while (window.isOpen())
 	{

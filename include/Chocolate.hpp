@@ -1,7 +1,8 @@
-class Chip8
+class Chocolate
 {
 	public:
-		Chip8(const char gameFile[]);
+		Chocolate(const char gameFile[]);
+		Chocolate();
 		void reset();
 		void tick();
 		bool getPixel(int, int);
