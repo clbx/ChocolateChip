@@ -74,6 +74,9 @@ void Chocolate::_00E0(){
 			pixels[i][j] = false;
 		}
 	}
+
+
+	
 }
 
 
@@ -83,12 +86,14 @@ void Chocolate::_00E0(){
  */
 void Chocolate::_00EE(){
 	if(stackPointer != 0){
-		programCounter = stack[stackPointer];
 		programCounter--;
+		programCounter = stack[stackPointer];
 	}
 	else{
 		fprintf(stderr,"ERROR: Stack Underflow");
 	}
+
+
 
 	
 }
