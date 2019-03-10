@@ -51,14 +51,194 @@ void Chocolate::tick()
 	unsigned short opcode = memory[programCounter] << 8;
 	opcode |= memory[programCounter + 1];
 
-	// This offset (x2 bytes) will be applied to the program counter after the opcode is processed
-	int pcDelta = 1;
-
 	switch (opcode >> 12) {
+
 	}
-	programCounter += 2 * pcDelta;
 
 }
+
+
+/******************
+OPCODE FUNCTIONS
+Opcodes
+*******************/
+
+/** 00E0
+ * @brief Clears the screen
+ * 
+ * 
+ */
+void Chocolate::_00E0(){
+	for(int i = 0; i < 64; i++){
+		for(int j = 0; j < 64; j++){
+			pixels[i][j] = false;
+		}
+	}
+}
+
+
+/**
+ * @brief Returns from a subroutine
+ * 
+ */
+void Chocolate::_00EE(){
+	if(stackPointer != 0){
+		programCounter = stack[stackPointer];
+		programCounter--;
+	}
+	else{
+		fprintf(stderr,"ERROR: Stack Underflow");
+	}
+
+	
+}
+
+void Chocolate::_1NNN(unsigned short opcode){
+
+}
+
+
+void Chocolate::_2NNN(unsigned short opcode){
+
+}
+
+void Chocolate::_3XNN(unsigned short opcode){
+
+}
+
+void Chocolate::_4XNN(unsigned short opcode){
+
+}
+
+
+void Chocolate::_5XY0(unsigned char opcode){
+
+}
+
+void Chocolate::_6XNN(unsigned short opcode){
+
+}
+
+void Chocolate::_7XNN(unsigned short opcode){
+
+}
+
+void Chocolate::_8XY0(unsigned char opcode){
+
+}
+
+void Chocolate::_8XY1(unsigned char opcode){
+
+}
+
+void Chocolate::_8XY2(unsigned char opcode){
+
+}
+
+void Chocolate::_8XY3(unsigned char opcode){
+
+}
+
+void Chocolate::_8XY3(unsigned char opcode){
+
+}
+
+void Chocolate::_8XY4(unsigned char opcode){
+
+}
+
+void Chocolate::_8XY5(unsigned char opcode){
+
+}
+
+void Chocolate::_8XY6(unsigned char opcode){
+
+}
+
+void Chocolate::_8XY7(unsigned char opcode){
+
+}
+
+void Chocolate::_8XYE(unsigned char opcode){
+
+}
+
+void Chocolate::_9XY0(unsigned char opcode){
+
+}
+
+void Chocolate::_ANNN(unsigned short opcode){
+
+}
+
+void Chocolate::_BNNN(unsigned short opcode){
+
+}
+
+void Chocolate::_CXNN(unsigned short opcode){
+
+}
+
+void Chocolate::_DXYN(unsigned short opcode){
+
+}
+
+void Chocolate::_EX9E(unsigned char opcode){
+
+}
+
+void Chocolate::_EXA1(unsigned char opcode){
+
+}
+
+void Chocolate::_FX07(unsigned char opcode){
+
+}
+
+void Chocolate::_FX0A(unsigned char opcode){
+
+}
+
+void Chocolate::_FX15(unsigned char opcode){
+
+}
+
+void Chocolate::_FX18(unsigned char opcode){
+
+}
+
+void Chocolate::_FX1E(unsigned char opcode){
+
+}
+
+void Chocolate::_FX29(unsigned char opcode){
+
+}
+
+void Chocolate::_FX33(unsigned char opcode){
+
+}
+
+void Chocolate::_FX55(unsigned char opcode){
+
+}
+
+void Chocolate::_FX65(unsigned char opcode){
+
+}
+
+
+
+
+
+
+
+
+/***********************************
+AUXILLARY FUNCTIONS
+Functions that are commonly used 
+************************************/
+
 
 bool Chocolate::getPixel(int x, int y)
 {
