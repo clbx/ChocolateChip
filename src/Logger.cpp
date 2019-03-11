@@ -2,8 +2,8 @@
 #include <string>
 
 Logger::Logger(){
-    int length = 0;
-    std::string log[512];
+    length = 0;
+    std::string log[64];
 }
 
 //TODO: Fix, this is slow af. Change to circular array
@@ -13,38 +13,42 @@ Logger::Logger(){
  * 
  * @param msg Message to log
  */
-void Logger::store(char* msg){
+void Logger::store(std::string msg){
     // Store until we get 512 messages
-    std::string tmp(msg);
     if(length < 512 - 1){
-        log[length] = tmp;
+        log[length] = msg;
         length++;
     }
+    
     //Otherwise move them all down one and then copy it in
     else{
         //[511] -> [510] ... [1] -> [0]
         for(int i = 511; i > 1; i--){
             log[i-1]=log[i];           
         }
-        log[length]=tmp;
+        log[length]=msg;
     }
 }
 
 /**
  * @brief Gets the last `amt` messages
  * 
- * @param amt the amount of messages to fetch
+ * @param amt the amount of messages to fetch, max 64
  */
 std::string* Logger::get(int amt){
 
-    std::string list[amt];
+    if(amt > 64){
+        amt = 64;
+    }
+
+    static std::string list[64];
 
     for(int i = 0; i < amt; i++){
         int index = length - i;
-        if(i < 1){
+        if(index < 1){
             return list;
         }
-        list[i] = log[i];
+        list[i] = log[length - i -1];
     }
     return list;
 }

@@ -34,7 +34,7 @@ class Chocolate
 		void _BNNN(unsigned short);
 		void _CXNN(unsigned short);
 		void _DXYN(unsigned short);
-		void _EX93(unsigned char);
+		void _EX9E(unsigned char);
 		void _EXA1(unsigned char);
 		void _FX07(unsigned char);
 		void _FX0A(unsigned char);

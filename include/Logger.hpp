@@ -9,15 +9,9 @@
 class Logger{
     public:
         Logger();
-        void store(char*);
+        void store(std::string);
         std::string* get(int);
-
-    private:
         int length;
-        std::string log[512];
+        std::string log[512];        
 
-
-
-
-
-}
+};

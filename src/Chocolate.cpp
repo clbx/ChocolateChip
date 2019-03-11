@@ -144,10 +144,6 @@ void Chocolate::_8XY3(unsigned char opcode){
 
 }
 
-void Chocolate::_8XY3(unsigned char opcode){
-
-}
-
 void Chocolate::_8XY4(unsigned char opcode){
 
 }

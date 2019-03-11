@@ -1,10 +1,11 @@
 #include <string>
 #include <gtest/gtest.h>
 #include "Chocolate.hpp"
+#include "Logger.hpp"
 
-
-TEST(AuxFunctions, CheckPixels)
-{
+TEST(Logger, AddMessages)
+{   
+    Logger logger;
 }
 
 
