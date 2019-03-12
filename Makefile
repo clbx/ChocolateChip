@@ -11,6 +11,6 @@ default:
 test: 
 	$(CXX) -g src/ChocolateTests.cpp src/Chocolate.cpp src/Logger.cpp $(CXXFLAGS) -lgtest -o "chocolate"
 temp:
-	$(CXX) -g src/TempMain.cpp src/Chocolate.cpp src/Logger.cpp $(CXXFLAGS) -lgtest -o "chocolate"
+	$(CXX) -g src/TempMain.cpp src/Chocolate.cpp src/Logger.cpp $(CXXFLAGS) -o "chocolate"
 clean:
 	rm -f chip8
