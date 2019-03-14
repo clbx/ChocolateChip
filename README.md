@@ -7,6 +7,9 @@ Some very useful resources:
 
 [Cowgod's Chip 8 Technical Referece](http://devernay.free.fr/hacks/chip8/C8TECH10.HTM)
 
+# Reqirements:
+[SFML](https://www.sfml-dev.org) for your platform
+A beep.wav to go in /res/beep.wav
 
 # CHIP 8 Design
 The CHIP-8 Has:
