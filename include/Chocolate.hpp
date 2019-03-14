@@ -1,6 +1,11 @@
+#include "Logger.hpp"
+
 class Chocolate
 {
 	public:
+
+		Logger logger;
+
 		Chocolate(const char gameFile[]);
 		Chocolate();
 		void reset();

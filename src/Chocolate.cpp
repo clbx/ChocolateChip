@@ -14,6 +14,8 @@ Chocolate::Chocolate(const char gameFile[])
 
 	fclose(file);
 
+	Logger logger;
+
 	//for (int i = 0; i < sizeof(memory); i += 2)
 	//	printf("(%d) %04X ", i, memory[i] << 8 | memory[i+1]);
 }
@@ -52,6 +54,16 @@ void Chocolate::tick()
 	opcode |= memory[programCounter + 1];
 
 	switch (opcode >> 12) {
+		case 0x0:{
+			_00E0();
+		}break;
+		case 0x1:{
+
+		}break;
+		default:{
+		}break;
+
+
 
 	}
 
@@ -74,8 +86,8 @@ void Chocolate::_00E0(){
 			pixels[i][j] = false;
 		}
 	}
-
-
+	logger.store("(00E0) Clearing Screen");
+	programCounter += 2;
 	
 }
 

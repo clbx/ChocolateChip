@@ -71,7 +71,12 @@ int main()
 			chip8.setKey(i, keyState[i]);
 
 		// Let the CHIP-8 process events and render graphics to its buffer
+		getchar();
 		chip8.tick();
+		std::string* log = chip8.logger.get(5);
+		for(int i = 0; i < 5; i ++){
+			std::cout << log[i] << std::endl;
+		}
 
 		// Set the screen back to black (we do this every frame before redrawing everything)
 		window.clear(sf::Color::Black);

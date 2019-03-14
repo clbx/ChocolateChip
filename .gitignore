@@ -33,6 +33,8 @@
 
 
 *.dSYM/
+res/
+.DS_Store
 
 chocolate
 tests
