@@ -12,6 +12,13 @@ Some very useful resources:
 
 * A beep.wav to go in /res/beep.wav
 
+# Todo:
+- [ ] Implement all CHIP-8 Opcodes
+- [ ] Implement Status Panel
+- [ ] Move from SFML to SDL
+- [ ] Create some ROMs
+- [ ] Make an Assembler
+
 # CHIP 8 Design
 The CHIP-8 Has:
 * 4KB of Addressable Memory (0x000 - 0xFFF), 500B used for the interperter
