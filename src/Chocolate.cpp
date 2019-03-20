@@ -53,18 +53,54 @@ void Chocolate::tick()
 	unsigned short opcode = memory[programCounter] << 8;
 	opcode |= memory[programCounter + 1];
 
-	switch (opcode >> 12) {
-		case 0x0:{
-			_00E0();
-		}break;
-		case 0x1:{
+	/* Here we will check the opcode received and go through digit by
+	* digit to reach the corrrect opcode
+	*
+	* First we check the first digit by &ing it with 0xF000,
+	* After that we go to the next digit
+	*
+	* While we could check each individual opcode, this is faster and
+	* better practice
+	*/
+	switch (opcode & 0xF000) {
+		// All 0x0 Opcodes
+		case 0x0000:{
+			/* Since there are only 2 opcodes for the 0's (00E0, and 00EE)
+			*  We'll only check the last digit since its the only difference
+			*/
+			switch( opcode & 0x000F){
+				// 00E0
+				case 0x0000:{
+					_00E0();
+				}break;
+				// 00EE
+				case 0x000E:{
+					_00EE();
+				}break;
+				default:{}break;
+			}
+		}
+		// Only one opcode here 1NNN.
+		case 0x1000:{
+			/*Here we also handle giving all the nessessary data to the function
+			* 1NNN needs a memory address, which is stored in an unsigned short
+			*
+			* An unsigned short is use because it is 2 bytes (16 bits)
+			* and a memory address is 1.5 bytes (12 bits), but you can't get half a byte
+			*
+			* It's unsigned to prevent any kind of werid stuff with signs
+			*/
+			unsigned short addr = (0x0FFF & opcode);
+			_1NNN(addr);
+		}
+		//Only one opcode here as well
+		case 0x2000:{
+			unsigned short addr = (0x0FFF & opcode);
+			_2NNN(addr);
+		}
+		case 0x3000:{
 
-		}break;
-		default:{
-		}break;
-
-
-
+		}
 	}
 
 }
@@ -92,34 +128,32 @@ void Chocolate::_00E0(){
 }
 
 
-/**
+/** 00E0
  * @brief Returns from a subroutine
  * 
  */
 void Chocolate::_00EE(){
 	if(stackPointer != 0){
-		programCounter--;
+		stackPointer--;
 		programCounter = stack[stackPointer];
+		programCounter += 2;
 	}
 	else{
-		fprintf(stderr,"ERROR: Stack Underflow");
+		logger.store("ERROR: Stack Underflow");
+		exit(1);
 	}
-
-
-
-	
 }
 
-void Chocolate::_1NNN(unsigned short opcode){
+void Chocolate::_1NNN(unsigned short addr){
 
 }
 
 
-void Chocolate::_2NNN(unsigned short opcode){
+void Chocolate::_2NNN(unsigned short addr){
 
 }
 
-void Chocolate::_3XNN(unsigned short opcode){
+void Chocolate::_3XNN(unsigned char reg, unsigned char val){
 
 }
 
