@@ -206,15 +206,44 @@ void Chocolate::_4XNN(unsigned short opcode){
 	else{
 		programCounter += 2;
 	}
+
 }
 
 
+/** 5XY0
+ *  @brief Skips the next instruction if V(x) = V(y)
+ *
+ *  @param opcode X: V(x) the first register
+ *  		  Y: V(y) the second register
+ *
+ */
 void Chocolate::_5XY0(unsigned short opcode){
+	int x = (opcode & 0x0F00) >> 8;
+	int y = (opcode & 0x00F0) >> 4;
 
+	if(registers[x] == registers[y]){
+		programCounter += 4;
+	}
+	else{
+		programCounter += 2;
+	}	
 }
 
-void Chocolate::_6XNN(unsigned short opcode){
 
+
+/** 6XNN
+ * @brief Sets V(x) to NN 
+ * 
+ * @param opcode x: V(x) register to change
+ *               NN: The data to set the register too
+ *
+ */
+void Chocolate::_6XNN(unsigned short opcode){
+	int index = (opcode & 0x0F00) >> 8;
+	int val = opcode & 0x00FF;
+	
+	registers[index] = val;
+	
 }
 
 void Chocolate::_7XNN(unsigned short opcode){
