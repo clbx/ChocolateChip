@@ -20,8 +20,8 @@ class Chocolate
 		void _00EE();
 		void _1NNN(unsigned short);
 		void _2NNN(unsigned short);
-		void _3XNN(unsigned char, unsigned char);
-		void _4XNN(unsigned short);
+		void _3XNN(int, int);
+		void _4XNN(unsigned char, unsigned char);
 		void _5XY0(unsigned char);
 		void _6XNN(unsigned short);
 		void _7XNN(unsigned short);

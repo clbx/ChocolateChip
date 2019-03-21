@@ -20,8 +20,12 @@ Chocolate::Chocolate(const char gameFile[])
 	//	printf("(%d) %04X ", i, memory[i] << 8 | memory[i+1]);
 }
 
+
+
 Chocolate::Chocolate() //For Testing Purposes Only
 {
+
+	
 	reset();
 }
 
@@ -79,27 +83,24 @@ void Chocolate::tick()
 				}break;
 				default:{}break;
 			}
-		}
+		}break;
 		// Only one opcode here 1NNN.
 		case 0x1000:{
-			/*Here we also handle giving all the nessessary data to the function
-			* 1NNN needs a memory address, which is stored in an unsigned short
-			*
-			* An unsigned short is use because it is 2 bytes (16 bits)
-			* and a memory address is 1.5 bytes (12 bits), but you can't get half a byte
-			*
-			* It's unsigned to prevent any kind of werid stuff with signs
-			*/
-			unsigned short addr = (0x0FFF & opcode);
-			_1NNN(addr);
-		}
+			_1NNN(opcode);
+		}break;
 		//Only one opcode here as well
 		case 0x2000:{
-			unsigned short addr = (0x0FFF & opcode);
-			_2NNN(addr);
-		}
+			_2NNN(opcode);
+		}break;
 		case 0x3000:{
-
+			_3XNN(opcode);	
+		}break;
+		case 0x4000:{
+			_4XNN(opcode);
+		}
+		default:{
+			printf("Unknown Opcode Read");
+			programCounter += 2;
 		}
 	}
 
@@ -144,25 +145,71 @@ void Chocolate::_00EE(){
 	}
 }
 
-void Chocolate::_1NNN(unsigned short addr){
+/** 1NNN
+ * @brief Jumps to a memory address
+ * 
+ * @param opcode NNN: Memory Address to jump to 
+ * 
+ */
+void Chocolate::_1NNN(unsigned short opcode){
+	/*
+	* By using the & function we are able to get parts of the opcode that we want
+	* However if they are not in the last few digits they must be bit shifted
+	*/
+	unsigned short address = (opcode & 0x0FFF);
+	programCounter = address;
+}
+
+/** 2NNN
+ * @brief Calls a subroutine at addr
+ * 
+ * @param opcode NNN: Memory address where subroutine is
+ */
+void Chocolate::_2NNN(unsigned short opcode){
+	stack[stackPointer] = programCounter;
+	stackPointer++;
+	programCounter = (opcode & 0x0FFF);
+}
+
+/** 3XNN
+ * @brief Skips the next instruction if the the Vx equals NN
+ * 
+ * @param opcode Vx: The register to check
+ *               NN: The value to check against
+ */
+void Chocolate::_3XNN(unsigned short opcode){
+	int index = (opcode & 0x0F00) >> 8;
+	int val = opcode & 0x00FF;
+
+	if(index == val){
+		programCounter += 4;
+	}
+	else{
+		programCounter += 2;
+	}
 
 }
 
-
-void Chocolate::_2NNN(unsigned short addr){
-
-}
-
-void Chocolate::_3XNN(unsigned char reg, unsigned char val){
-
-}
-
+/** 4XNN
+ * @brief Skips next instruction is Vx != NN (Opoosite of 3XNN)
+ * 
+ * @param opcode Vx: The register to check
+ *               NN: The value to check against
+ */
 void Chocolate::_4XNN(unsigned short opcode){
+	int index = (opcode & 0x0F00) >> 8;
+	int val = opcode & 0x00FF;
 
+	if(index != val){
+		programCounter += 4;
+	}
+	else{
+		programCounter += 2;
+	}
 }
 
 
-void Chocolate::_5XY0(unsigned char opcode){
+void Chocolate::_5XY0(unsigned short opcode){
 
 }
 
@@ -174,43 +221,43 @@ void Chocolate::_7XNN(unsigned short opcode){
 
 }
 
-void Chocolate::_8XY0(unsigned char opcode){
+void Chocolate::_8XY0(unsigned short opcode){
 
 }
 
-void Chocolate::_8XY1(unsigned char opcode){
+void Chocolate::_8XY1(unsigned short opcode){
 
 }
 
-void Chocolate::_8XY2(unsigned char opcode){
+void Chocolate::_8XY2(unsigned short opcode){
 
 }
 
-void Chocolate::_8XY3(unsigned char opcode){
+void Chocolate::_8XY3(unsigned short opcode){
 
 }
 
-void Chocolate::_8XY4(unsigned char opcode){
+void Chocolate::_8XY4(unsigned short opcode){
 
 }
 
-void Chocolate::_8XY5(unsigned char opcode){
+void Chocolate::_8XY5(unsigned short opcode){
 
 }
 
-void Chocolate::_8XY6(unsigned char opcode){
+void Chocolate::_8XY6(unsigned short opcode){
 
 }
 
-void Chocolate::_8XY7(unsigned char opcode){
+void Chocolate::_8XY7(unsigned short opcode){
 
 }
 
-void Chocolate::_8XYE(unsigned char opcode){
+void Chocolate::_8XYE(unsigned short opcode){
 
 }
 
-void Chocolate::_9XY0(unsigned char opcode){
+void Chocolate::_9XY0(unsigned short opcode){
 
 }
 
@@ -230,47 +277,47 @@ void Chocolate::_DXYN(unsigned short opcode){
 
 }
 
-void Chocolate::_EX9E(unsigned char opcode){
+void Chocolate::_EX9E(unsigned short opcode){
 
 }
 
-void Chocolate::_EXA1(unsigned char opcode){
+void Chocolate::_EXA1(unsigned short opcode){
 
 }
 
-void Chocolate::_FX07(unsigned char opcode){
+void Chocolate::_FX07(unsigned short opcode){
 
 }
 
-void Chocolate::_FX0A(unsigned char opcode){
+void Chocolate::_FX0A(unsigned short opcode){
 
 }
 
-void Chocolate::_FX15(unsigned char opcode){
+void Chocolate::_FX15(unsigned short opcode){
 
 }
 
-void Chocolate::_FX18(unsigned char opcode){
+void Chocolate::_FX18(unsigned short opcode){
 
 }
 
-void Chocolate::_FX1E(unsigned char opcode){
+void Chocolate::_FX1E(unsigned short opcode){
 
 }
 
-void Chocolate::_FX29(unsigned char opcode){
+void Chocolate::_FX29(unsigned short opcode){
 
 }
 
-void Chocolate::_FX33(unsigned char opcode){
+void Chocolate::_FX33(unsigned short opcode){
 
 }
 
-void Chocolate::_FX55(unsigned char opcode){
+void Chocolate::_FX55(unsigned short opcode){
 
 }
 
-void Chocolate::_FX65(unsigned char opcode){
+void Chocolate::_FX65(unsigned short opcode){
 
 }
 

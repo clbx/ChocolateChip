@@ -3,10 +3,6 @@
 #include "Chocolate.hpp"
 #include "Logger.hpp"
 
-TEST(Logger, AddMessages)
-{   
-    Logger logger;
-}
 
 
 int main(int argc, char* argv[]){

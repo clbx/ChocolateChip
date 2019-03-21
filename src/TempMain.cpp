@@ -1,28 +1,18 @@
 #include <string>
 #include "Chocolate.hpp"
-#include "Logger.hpp"
 
 using namespace std;
 
 
 int main(){
-    Logger logger;
-    logger.store("Hello world");
-    logger.store("Goodbye World");
-    logger.store("Ayo");
 
+    //10
 
-    cout << logger.log[0] << endl;
-    cout << logger.log[1] << endl;
-    cout << logger.log[2] << endl;
-    cout << logger.length << endl;
-    int len = 2;
+    //203
 
-
-    string* recv = logger.get(len);
-
-    for(int i = 0; i < len; i++){
-        cout << recv[i] << endl;
-    }
+    int reg = (0x3ACB & 0x0F00) >> 8;
+    int dat = (0x3ACB & 0x00FF);
+    printf("%d\n", reg);
+    printf("%d",dat);
 
 }
