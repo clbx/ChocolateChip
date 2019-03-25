@@ -1,4 +1,5 @@
 #include "Logger.hpp"
+#include <sstream>
 
 class Chocolate
 {
@@ -20,36 +21,36 @@ class Chocolate
 		void _00EE();
 		void _1NNN(unsigned short);
 		void _2NNN(unsigned short);
-		void _3XNN(int, int);
-		void _4XNN(unsigned char, unsigned char);
-		void _5XY0(unsigned char);
+		void _3XNN(unsigned short);
+		void _4XNN(unsigned short);
+		void _5XY0(unsigned short);
 		void _6XNN(unsigned short);
 		void _7XNN(unsigned short);
-		void _8XY0(unsigned char);
-		void _8XY1(unsigned char);
-		void _8XY2(unsigned char);
-		void _8XY3(unsigned char);
-		void _8XY4(unsigned char);
-		void _8XY5(unsigned char);
-		void _8XY6(unsigned char);
-		void _8XY7(unsigned char);
-		void _8XYE(unsigned char);
-		void _9XY0(unsigned char);
+		void _8XY0(unsigned short);
+		void _8XY1(unsigned short);
+		void _8XY2(unsigned short);
+		void _8XY3(unsigned short);
+		void _8XY4(unsigned short);
+		void _8XY5(unsigned short);
+		void _8XY6(unsigned short);
+		void _8XY7(unsigned short);
+		void _8XYE(unsigned short);
+		void _9XY0(unsigned short);
 		void _ANNN(unsigned short);
 		void _BNNN(unsigned short);
 		void _CXNN(unsigned short);
 		void _DXYN(unsigned short);
-		void _EX9E(unsigned char);
-		void _EXA1(unsigned char);
-		void _FX07(unsigned char);
-		void _FX0A(unsigned char);
-		void _FX15(unsigned char);
-		void _FX18(unsigned char);
-		void _FX1E(unsigned char);
-		void _FX29(unsigned char);
-		void _FX33(unsigned char);
-		void _FX55(unsigned char);
-		void _FX65(unsigned char);
+		void _EX9E(unsigned short);
+		void _EXA1(unsigned short);
+		void _FX07(unsigned short);
+		void _FX0A(unsigned short);
+		void _FX15(unsigned short);
+		void _FX18(unsigned short);
+		void _FX1E(unsigned short);
+		void _FX29(unsigned short);
+		void _FX33(unsigned short);
+		void _FX55(unsigned short);
+		void _FX65(unsigned short);
 
 
 	private:
@@ -69,4 +70,6 @@ class Chocolate
 		bool keyStates[16]; // true for pressed, false for unpressed
 
 		bool pixels[64][32];
+
+		std::stringstream logstmt;
 };

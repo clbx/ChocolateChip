@@ -11,9 +11,13 @@ int main()
 	// Load CHIP-8 buzzer sound
 
 
-	char rom[64];
+	char* rom = (char*)"rom/t";
+
+	/*
 	printf("Enter ROM file path: ");
 	scanf("%s",rom);
+	*/
+
 
 	sf::SoundBuffer buffer;
 	if (!buffer.loadFromFile("res/beep.wav")) {

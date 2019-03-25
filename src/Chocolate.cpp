@@ -1,8 +1,9 @@
-#include "Chocolate.hpp"
+#include "../include/Chocolate.hpp"
 
 #include <cstdlib>
 #include <cstdio>
 #include <cstring>
+
 
 Chocolate::Chocolate(const char gameFile[])
 {
@@ -29,6 +30,10 @@ Chocolate::Chocolate() //For Testing Purposes Only
 	reset();
 }
 
+
+
+
+
 void Chocolate::reset()
 {
 	memset(memory, 0, sizeof(memory));
@@ -47,12 +52,18 @@ void Chocolate::reset()
 
 	memset(pixels, 0, 64*32);
 
+	logstmt.str(std::string());
+	logstmt.clear();
+
 }
 
 void Chocolate::tick()
 {
+	//Log message
+	
 
-	printf("[%03X] ", programCounter);
+	//Put in the program counter
+	logstmt << "[" << std::hex << std::uppercase << programCounter << std::dec << "]: ";
 
 	unsigned short opcode = memory[programCounter] << 8;
 	opcode |= memory[programCounter + 1];
@@ -97,13 +108,22 @@ void Chocolate::tick()
 		}break;
 		case 0x4000:{
 			_4XNN(opcode);
-		}
+		}break;
+		case 0x5000:{
+			_5XY0(opcode);
+		}break;
+		case 0x6000:{
+			_6XNN(opcode);
+		}break;
 		default:{
-			printf("Unknown Opcode Read");
+			logstmt << "Unknown Opcode Read";
 			programCounter += 2;
 		}
 	}
-
+	//logstmt << std::endl; //Give it an endline
+	logger.store(logstmt.str()); //Log what's been recorded in the stream
+	std::stringstream().swap(logstmt);
+	printf("HERE?\n");
 }
 
 
@@ -118,14 +138,17 @@ Opcodes
  * 
  */
 void Chocolate::_00E0(){
+	//logstmt << "(00E0 : 00E0) ";
+
 	for(int i = 0; i < 64; i++){
 		for(int j = 0; j < 64; j++){
 			pixels[i][j] = false;
 		}
 	}
-	logger.store("(00E0) Clearing Screen");
-	programCounter += 2;
+	//TODO: More verbose logging, build a useful string
 	
+	//logstmt << "Screen Cleared";
+	programCounter += 2;
 }
 
 
@@ -134,10 +157,14 @@ void Chocolate::_00E0(){
  * 
  */
 void Chocolate::_00EE(){
+	logstmt << "(00EE : 00EE) ";
+
 	if(stackPointer != 0){
 		stackPointer--;
 		programCounter = stack[stackPointer];
 		programCounter += 2;
+		//SH = Stack Height,
+		logstmt << "Returning from sub. SH[" << stackPointer << "]";
 	}
 	else{
 		logger.store("ERROR: Stack Underflow");
@@ -152,11 +179,13 @@ void Chocolate::_00EE(){
  * 
  */
 void Chocolate::_1NNN(unsigned short opcode){
+	logstmt << "(1NNN : " << std::hex << (opcode & 0xFFFF) << std::dec << ") ";
 	/*
 	* By using the & function we are able to get parts of the opcode that we want
 	* However if they are not in the last few digits they must be bit shifted
 	*/
 	unsigned short address = (opcode & 0x0FFF);
+	logstmt << "Jumping to: " << std::hex << address << std::dec;
 	programCounter = address;
 }
 
@@ -166,9 +195,17 @@ void Chocolate::_1NNN(unsigned short opcode){
  * @param opcode NNN: Memory address where subroutine is
  */
 void Chocolate::_2NNN(unsigned short opcode){
-	stack[stackPointer] = programCounter;
-	stackPointer++;
-	programCounter = (opcode & 0x0FFF);
+	logstmt << "(2NNN : " << std::hex << (opcode & 0xFFFF) << std::dec << ") ";
+
+	stack[stackPointer] = programCounter; //Put the current location on the stack
+	unsigned short address = (opcode & 0x0FFF);
+	
+	//Log
+	logstmt << "Storing " << std::hex << programCounter << std::dec << " at Stack[" 
+	<< stackPointer << "] Jumping to: " << std::hex << address << std::dec;
+
+	stackPointer++;//Increase the stack pointer
+	programCounter = address; // Jump to new location
 }
 
 /** 3XNN
@@ -178,20 +215,29 @@ void Chocolate::_2NNN(unsigned short opcode){
  *               NN: The value to check against
  */
 void Chocolate::_3XNN(unsigned short opcode){
+	logstmt << "(3XNN : " << std::hex << (opcode & 0xFFFF) << std::dec << ") ";
+
 	int index = (opcode & 0x0F00) >> 8;
+	int regNum = registers[index];
 	int val = opcode & 0x00FF;
 
-	if(index == val){
+	logstmt << "V[" << index << "] = " << regNum << " (" 
+	<< std::hex << regNum << std::dec << ") "; 
+
+
+	if(regNum == val){
+		logstmt << " == " << val << " (" << std::hex << val << std::dec << ") Skipping Next Instruction";
 		programCounter += 4;
 	}
 	else{
+		logstmt << " != " << val << " (" << std::hex << val << std::dec << ") Continuing";
 		programCounter += 2;
 	}
 
 }
 
 /** 4XNN
- * @brief Skips next instruction is Vx != NN (Opoosite of 3XNN)
+ * @brief Skips next instruction is Vx != NN (Opposite of 3XNN)
  * 
  * @param opcode Vx: The register to check
  *               NN: The value to check against
@@ -200,7 +246,7 @@ void Chocolate::_4XNN(unsigned short opcode){
 	int index = (opcode & 0x0F00) >> 8;
 	int val = opcode & 0x00FF;
 
-	if(index != val){
+	if(registers[index] != val){
 		programCounter += 4;
 	}
 	else{
@@ -243,6 +289,8 @@ void Chocolate::_6XNN(unsigned short opcode){
 	int val = opcode & 0x00FF;
 	
 	registers[index] = val;
+
+	programCounter += 2;
 	
 }
 
