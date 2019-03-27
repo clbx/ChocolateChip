@@ -5,10 +5,11 @@ Some very useful resources:
 
 [Chip 8's Wikipedia Page](https://en.wikipedia.org/wiki/CHIP-8)
 
-[Cowgod's Chip 8 Technical Referece](http://devernay.free.fr/hacks/chip8/C8TECH10.HTM)
+[Cowgod's Chip 8 Technical Reference](http://devernay.free.fr/hacks/chip8/C8TECH10.HTM)
 
-# Reqirements:
-* [SFML](https://www.sfml-dev.org) for your platform
+# Requirements:
+* [SFML](https://www.sfml-dev.org)
+* [fmt](https://github.com/fmtlib/fmt)
 
 * A beep.wav to go in /res/beep.wav
 
@@ -21,9 +22,9 @@ Some very useful resources:
 
 # CHIP 8 Design
 The CHIP-8 Has:
-* 4KB of Addressable Memory (0x000 - 0xFFF), 500B used for the interperter
+* 4KB of Addressable Memory (0x000 - 0xFFF), 500B used for the interpreter
 * 1 16-Bit Memory (I) for storing the memory address (**However only 12 are usually used**)
-* An 16 element long array of 16-bit values to hold return pointers (Included in that 500B used by the interperter)
+* An 16 element long array of 16-bit values to hold return pointers (Included in that 500B used by the interpreter)
 * 15 8-Bit General Use Registers (V0-VE)
 * 1 8-Bit Flag Register (VF)
 * 2 8-Bit Registers used for delay and sound timers
