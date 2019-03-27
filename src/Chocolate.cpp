@@ -320,7 +320,7 @@ void Chocolate::_8XY0(unsigned short opcode){
 	int xIndex = (opcode & 0x0F00) >> 8;
 	int yIndex = (opcode & 0x00F0) >> 4;
 
-	unsigned char yVal = registers[xIndex];
+	unsigned char yVal = registers[yIndex];
 
 	registers[xIndex] = yVal;
 
@@ -336,7 +336,7 @@ void Chocolate::_8XY1(unsigned short opcode){
 	int xIndex = (opcode & 0x0F00) >> 8;
 	int yIndex = (opcode & 0x00F0) >> 4;
 
-	unsigned char yVal = registers[xIndex];
+	unsigned char yVal = registers[yIndex];
 	unsigned char xVal = registers[xIndex];
 
 	unsigned char orVal = xVal|yVal;
@@ -354,7 +354,7 @@ void Chocolate::_8XY2(unsigned short opcode){
 	int xIndex = (opcode & 0x0F00) >> 8;
 	int yIndex = (opcode & 0x00F0) >> 4;
 
-	unsigned char yVal = registers[xIndex];
+	unsigned char yVal = registers[yIndex];
 	unsigned char xVal = registers[xIndex];
 
 	unsigned char andVal = xVal&yVal;
@@ -372,7 +372,7 @@ void Chocolate::_8XY3(unsigned short opcode){
 	int xIndex = (opcode & 0x0F00) >> 8;
 	int yIndex = (opcode & 0x00F0) >> 4;
 
-	unsigned char yVal = registers[xIndex];
+	unsigned char yVal = registers[yIndex];
 	unsigned char xVal = registers[xIndex];
 
 	unsigned char xorVal = xVal^yVal;
