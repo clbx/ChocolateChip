@@ -52,8 +52,7 @@ void Chocolate::reset()
 
 	memset(pixels, 0, 64*32);
 
-	logstmt.str("");
-	logstmt.clear();
+	logstmt = "";
 
 }
 
@@ -120,11 +119,9 @@ void Chocolate::tick()
 			programCounter += 2;
 		}
 	}
-	//logstmt << std::endl; //Give it an endline
-	logger.store(logstmt.str()); //Log what's been recorded in the stream
-	logstmt.str("");
-	logstmt.clear();
-	printf("HERE?\n");
+	logstmt += "\n"; //Give it an endline
+	logger.store(logstmt);
+	logstmt = ("");
 }
 
 
@@ -148,7 +145,7 @@ void Chocolate::_00E0(){
 	}
 	//TODO: More verbose logging, build a useful string
 	
-	this->logstmt << "Screen Cleared";
+	logstmt +=  "Screen Cleared";
 	programCounter += 2;
 }
 
@@ -165,7 +162,7 @@ void Chocolate::_00EE(){
 		programCounter = stack[stackPointer];
 		programCounter += 2;
 		//SH = Stack Height,
-		//logstmt << "Returning from sub. SH[" << stackPointer << "]";
+		logstmt << "Returning from sub. SH[" << stackPointer << "]";
 	}
 	else{
 		logger.store("ERROR: Stack Underflow");

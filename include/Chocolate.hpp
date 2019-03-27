@@ -71,5 +71,5 @@ class Chocolate
 
 		bool pixels[64][32];
 
-		std::stringstream logstmt;
+		std::string logstmt;
 };
