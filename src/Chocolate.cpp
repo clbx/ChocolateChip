@@ -1,4 +1,5 @@
 #include "../include/Chocolate.hpp"
+#include <fmt/core.h>
 
 #include <cstdlib>
 #include <cstdio>
@@ -62,7 +63,7 @@ void Chocolate::tick()
 	
 
 	//Put in the program counter
-	//logstmt << "[" << std::hex << std::uppercase << programCounter << std::dec << "]: ";
+	logstmt += fmt::format("[{:X}]: ", programCounter);
 
 	unsigned short opcode = memory[programCounter] << 8;
 	opcode |= memory[programCounter + 1];
@@ -115,7 +116,7 @@ void Chocolate::tick()
 			_6XNN(opcode);
 		}break;
 		default:{
-			//logstmt << "Unknown Opcode Read";
+			logstmt += "Unknown Opcode Read";
 			programCounter += 2;
 		}
 	}
@@ -136,7 +137,7 @@ Opcodes
  * 
  */
 void Chocolate::_00E0(){
-	//logstmt << "(00E0 : 00E0) ";
+	logstmt += "(00E0 : 00E0) ";
 
 	for(int i = 0; i < 64; i++){
 		for(int j = 0; j < 64; j++){
@@ -155,14 +156,14 @@ void Chocolate::_00E0(){
  * 
  */
 void Chocolate::_00EE(){
-	//logstmt << "(00EE : 00EE) ";
+	logstmt += "(00EE : 00EE) ";
 
 	if(stackPointer != 0){
 		stackPointer--;
 		programCounter = stack[stackPointer];
 		programCounter += 2;
 		//SH = Stack Height,
-		logstmt << "Returning from sub. SH[" << stackPointer << "]";
+		logstmt += fmt::format("Returning from sub. SH[{}]",stackPointer);
 	}
 	else{
 		logger.store("ERROR: Stack Underflow");
@@ -177,7 +178,7 @@ void Chocolate::_00EE(){
  * 
  */
 void Chocolate::_1NNN(unsigned short opcode){
-	//logstmt << "(1NNN : " << std::hex << (opcode & 0xFFFF) << std::dec << ") ";
+	logstmt += fmt::format("(1NNN : {:X}) ",opcode & 0xFFFF);
 	/*
 	* By using the & function we are able to get parts of the opcode that we want
 	* However if they are not in the last few digits they must be bit shifted
@@ -193,14 +194,13 @@ void Chocolate::_1NNN(unsigned short opcode){
  * @param opcode NNN: Memory address where subroutine is
  */
 void Chocolate::_2NNN(unsigned short opcode){
-	//logstmt << "(2NNN : " << std::hex << (opcode & 0xFFFF) << std::dec << ") ";
+	logstmt += fmt::format("(2NNN : {:X}) ",opcode & 0xFFFF);
 
 	stack[stackPointer] = programCounter; //Put the current location on the stack
 	unsigned short address = (opcode & 0x0FFF);
 	
 	//Log
-	//logstmt << "Storing " << std::hex << programCounter << std::dec << " at Stack[" << stackPointer << "] Jumping to: " << std::hex << address << std::dec;
-
+	logstmt += fmt::format("Storing {:X} at Stack[{}]. Jumping to {:X}",programCounter,stackPointer,address);
 	stackPointer++;//Increase the stack pointer
 	programCounter = address; // Jump to new location
 }
@@ -212,21 +212,21 @@ void Chocolate::_2NNN(unsigned short opcode){
  *               NN: The value to check against
  */
 void Chocolate::_3XNN(unsigned short opcode){
-	//logstmt << "(3XNN : " << std::hex << (opcode & 0xFFFF) << std::dec << ") ";
+	logstmt += fmt::format("(3XNN : {:X}) ",opcode & 0xFFFF);
 
 	int index = (opcode & 0x0F00) >> 8;
 	int regNum = registers[index];
 	int val = opcode & 0x00FF;
 
-	//logstmt << "V[" << index << "] = " << regNum << " (" << std::hex << regNum << std::dec << ") "; 
+	logstmt += fmt::format("V[{}] =  {}({:X}) ",index,regNum,regNum);
 
 
 	if(regNum == val){
-		//logstmt << " == " << val << " (" << std::hex << val << std::dec << ") Skipping Next Instruction";
+		logstmt += fmt::format("== {}({:X}) Skipping Next Instruction",val,val);
 		programCounter += 4;
 	}
 	else{
-		//logstmt << " != " << val << " (" << std::hex << val << std::dec << ") Continuing";
+		logstmt += fmt::format("!= {}({:X})",val,val);
 		programCounter += 2;
 	}
 
