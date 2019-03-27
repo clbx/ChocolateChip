@@ -52,7 +52,7 @@ void Chocolate::reset()
 
 	memset(pixels, 0, 64*32);
 
-	logstmt.str(std::string());
+	logstmt.str("");
 	logstmt.clear();
 
 }
@@ -122,6 +122,8 @@ void Chocolate::tick()
 	}
 	//logstmt << std::endl; //Give it an endline
 	logger.store(logstmt.str()); //Log what's been recorded in the stream
+	logstmt.str("");
+	logstmt.clear();
 	printf("HERE?\n");
 }
 
@@ -146,7 +148,7 @@ void Chocolate::_00E0(){
 	}
 	//TODO: More verbose logging, build a useful string
 	
-	logstmt << "Screen Cleared";
+	this->logstmt << "Screen Cleared";
 	programCounter += 2;
 }
 
