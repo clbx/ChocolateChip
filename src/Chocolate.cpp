@@ -226,7 +226,7 @@ void Chocolate::_3XNN(unsigned short opcode){
 		programCounter += 4;
 	}
 	else{
-		logstmt += fmt::format("!= {}({:X})",val,val);
+		logstmt += fmt::format("!= {}({:X}) Continuing",val,val);
 		programCounter += 2;
 	}
 
@@ -239,13 +239,21 @@ void Chocolate::_3XNN(unsigned short opcode){
  *               NN: The value to check against
  */
 void Chocolate::_4XNN(unsigned short opcode){
+	logstmt += fmt::format("(4XNN : {:X}) ",opcode & 0xFFFF);
 	int index = (opcode & 0x0F00) >> 8;
 	int val = opcode & 0x00FF;
+	int regNum = registers[index];
 
-	if(registers[index] != val){
+
+	logstmt += fmt::format("V[{}] =  {}({:X}) ",index,regNum,regNum);
+
+
+	if(regNum != val){
+		logstmt += fmt::format("!= {}({:X}) Skipping Next Instruction",val,val);
 		programCounter += 4;
 	}
 	else{
+		logstmt += fmt::format("== {}({:X}) Continuing",val,val);
 		programCounter += 2;
 	}
 
@@ -290,23 +298,86 @@ void Chocolate::_6XNN(unsigned short opcode){
 	
 }
 
+/** 7XNN
+ * @brief Adds NN to V(x) 
+ * 
+ * @param opcode x: V(x) the register to add too
+ *              NN: The amount to add
+ */
 void Chocolate::_7XNN(unsigned short opcode){
-
+	int index = (opcode & 0x0F00) >> 8;
+	unsigned char add = opcode & 0x00FF;
+	registers[index] += add;
 }
 
+/** 8XY0
+ * @brief Sets V(x) to V(y)
+ * 
+ * @param opcode x: the first register
+ *               y: the second register
+ */
 void Chocolate::_8XY0(unsigned short opcode){
+	int xIndex = (opcode & 0x0F00) >> 8;
+	int yIndex = (opcode & 0x00F0) >> 4;
+
+	unsigned char yVal = registers[xIndex];
+
+	registers[xIndex] = yVal;
 
 }
 
+/** 8XY1
+ * @brief Bitwise OR, sets V(x) to V(x)|V(y)
+ * 
+ * @param opcode x: the first register
+ *               y: the second register
+ */
 void Chocolate::_8XY1(unsigned short opcode){
+	int xIndex = (opcode & 0x0F00) >> 8;
+	int yIndex = (opcode & 0x00F0) >> 4;
 
+	unsigned char yVal = registers[xIndex];
+	unsigned char xVal = registers[xIndex];
+
+	unsigned char orVal = xVal|yVal;
+
+	registers[xIndex] = orVal;
 }
 
+/** 8XY2
+ * @brief Bitwise AND, sets V(x) to V(x)&V(y)
+ * 
+ * @param opcode x: the first register
+ *               y: the second register
+ */
 void Chocolate::_8XY2(unsigned short opcode){
+	int xIndex = (opcode & 0x0F00) >> 8;
+	int yIndex = (opcode & 0x00F0) >> 4;
 
+	unsigned char yVal = registers[xIndex];
+	unsigned char xVal = registers[xIndex];
+
+	unsigned char andVal = xVal&yVal;
+
+	registers[xIndex] = andVal;
 }
 
+/**
+ * @brief Bitwise XOR, sets V(x) to V(x)^V(y)
+ * 
+ * @param opcode x: the first register
+ *               y: the second register
+ */
 void Chocolate::_8XY3(unsigned short opcode){
+	int xIndex = (opcode & 0x0F00) >> 8;
+	int yIndex = (opcode & 0x00F0) >> 4;
+
+	unsigned char yVal = registers[xIndex];
+	unsigned char xVal = registers[xIndex];
+
+	unsigned char xorVal = xVal^yVal;
+
+	registers[xIndex] = xorVal;
 
 }
 
