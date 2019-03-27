@@ -8,8 +8,8 @@ Some very useful resources:
 [Cowgod's Chip 8 Technical Reference](http://devernay.free.fr/hacks/chip8/C8TECH10.HTM)
 
 # Requirements:
-* [SFML](https://www.sfml-dev.org)
-* [fmt](https://github.com/fmtlib/fmt)
+* [SFML](https://www.sfml-dev.org) : For graphics
+* [fmt](https://github.com/fmtlib/fmt) : Because everything having to do with strings in C++ sucks. Makes logging easy
 
 * A beep.wav to go in /res/beep.wav
 
