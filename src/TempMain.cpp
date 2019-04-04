@@ -7,7 +7,11 @@ using namespace std;
 
 int main(){
 
-    std::string temp = fmt::format("Got : {:X} and {}", 0xA5, 0xA5);
-    std::cout << temp << std::endl;
+    unsigned char a = 0x0001;
+    unsigned char b = 0x0001;
 
+    int c = a + b;
+    printf("%d",c);
+
+	
 }

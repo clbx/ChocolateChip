@@ -308,6 +308,8 @@ void Chocolate::_7XNN(unsigned short opcode){
 	int index = (opcode & 0x0F00) >> 8;
 	unsigned char add = opcode & 0x00FF;
 	registers[index] += add;
+
+	programCounter += 2;
 }
 
 /** 8XY0
@@ -323,6 +325,8 @@ void Chocolate::_8XY0(unsigned short opcode){
 	unsigned char yVal = registers[yIndex];
 
 	registers[xIndex] = yVal;
+
+	programCounter += 2;
 
 }
 
@@ -342,6 +346,8 @@ void Chocolate::_8XY1(unsigned short opcode){
 	unsigned char orVal = xVal|yVal;
 
 	registers[xIndex] = orVal;
+
+	programCounter += 2;
 }
 
 /** 8XY2
@@ -360,6 +366,8 @@ void Chocolate::_8XY2(unsigned short opcode){
 	unsigned char andVal = xVal&yVal;
 
 	registers[xIndex] = andVal;
+
+	programCounter += 2;
 }
 
 /**
@@ -379,30 +387,127 @@ void Chocolate::_8XY3(unsigned short opcode){
 
 	registers[xIndex] = xorVal;
 
+	programCounter += 2;
+
 }
+
+/** 8XY4
+ * @brief V[x] += V[y]
+ * 
+ * @param opcode x: the first register 
+ *               y: the second register
+ */       
 
 void Chocolate::_8XY4(unsigned short opcode){
+	int xIndex = (opcode & 0x0F00) >> 8;
+	int yIndex = (opcode & 0x00F0) >> 4;
+
+	unsigned char yVal = registers[yIndex];
+	unsigned char xVal = registers[xIndex];
+
+	registers[xIndex] = yVal + xVal;
+
+	if(xVal + yVal > 0xFF){
+		registers[0xF] = 1;
+	}
+	else{
+		registers[0xF] = 0;
+	}
+	
+	programCounter += 2;
 
 }
 
+/**
+ * @brief 
+ * 
+ * @param opcode 
+ */
 void Chocolate::_8XY5(unsigned short opcode){
+	int xIndex = (opcode & 0x0F00) >> 8;
+	int yIndex = (opcode & 0x00F0) >> 4;
+
+	unsigned char yVal = registers[yIndex];
+	unsigned char xVal = registers[xIndex];
+
+	registers[xIndex] = yVal - xVal;
+
+	if(xVal - yVal < 0xFF){
+		registers[0xF] = 1;
+	}
+	else{
+		registers[0xF] = 0;
+	}
+	
+	programCounter += 2;
 
 }
 
+/**
+ * @brief 
+ * 
+ * @param opcode 
+ */
 void Chocolate::_8XY6(unsigned short opcode){
+	int xIndex = (opcode & 0x0F00) >> 8;
+	int yIndex = (opcode & 0x00F0) >> 4;
 
+	registers[0xF] = registers[xIndex] & 0x1;
+	registers[yIndex] >>= 1;
+
+	programCounter += 2;
 }
 
+/**
+ * @brief 
+ * 
+ * @param opcode 
+ */
 void Chocolate::_8XY7(unsigned short opcode){
+	int xIndex = (opcode & 0x0F00) >> 8;
+	int yIndex = (opcode & 0x00F0) >> 4;
 
+	unsigned char yVal = registers[yIndex];
+	unsigned char xVal = registers[xIndex];
+
+	registers[xIndex] = yVal - xVal;
+
+	if(xVal > yVal){
+		registers[0xF] = 0;
+	}
+	else{
+		registers[0xF] = 1;
+	}
+
+	programCounter += 2;
 }
 
 void Chocolate::_8XYE(unsigned short opcode){
+	int xIndex = (opcode & 0x0F00) >> 8;
+	int yIndex = (opcode & 0x00F0) >> 4;
+
+	registers[0xF] = registers[xIndex] >> 7;
+	registers[xIndex] <<= 1;
+
+	programCounter += 2;
 
 }
 
 void Chocolate::_9XY0(unsigned short opcode){
+	int xIndex = (opcode & 0x0F00) >> 8;
+	int yIndex = (opcode & 0x00F0) >> 4;
 
+	unsigned char yVal = registers[yIndex];
+	unsigned char xVal = registers[xIndex];
+
+	if(xVal != yVal){
+		programCounter += 4;
+	}
+	else
+	{
+		programCounter += 2;
+	}
+	
 }
 
 void Chocolate::_ANNN(unsigned short opcode){
