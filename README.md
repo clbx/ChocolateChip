@@ -13,6 +13,10 @@ Some very useful resources:
 
 * A beep.wav to go in /res/beep.wav
 
+# ROMs
+
+All ROMs in this repository are either written or from Revival Studio's ROM Pack 
+
 # Todo:
 - [ ] Implement all CHIP-8 Opcodes
 - [ ] Implement Status Panel
