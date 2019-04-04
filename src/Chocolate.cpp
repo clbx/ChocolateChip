@@ -115,8 +115,57 @@ void Chocolate::tick()
 		case 0x6000:{
 			_6XNN(opcode);
 		}break;
+		case 0x7000:{
+			_7XNN(opcode);
+		}break;
+		case 0x8000:{
+			switch(opcode & 0x000F){
+				case 0x0000:{
+					_8XY0(opcode);
+				}break;
+				case 0x0001:{
+					_8XY1(opcode);
+				}break;
+				case 0x0002:{
+					_8XY2(opcode);
+				}break;
+				case 0x0003:{
+					_8XY3(opcode);
+				}break;
+				case 0x0004:{
+					_8XY4(opcode);
+				}break;
+				case 0x0005:{
+					_8XY5(opcode);
+				}break;
+				case 0x0006:{
+					_8XY6(opcode);
+				}break;
+				case 0x0007:{
+					_8XY7(opcode);
+				}break;
+				case 0x000E:{
+					_8XYE(opcode);
+				}break;
+			}
+		}break;
+		case 0x9000:{
+			_9XY0(opcode);
+		}break;
+		case 0xA000:{
+			_ANNN(opcode);
+		}break;
+		case 0xB000:{
+			_BNNN(opcode);
+		}break;
+		case 0xC000:{
+			_CXNN(opcode);
+		}break;
+		case 0xD000:{
+			_DXYN(opcode);
+		}break;
 		default:{
-			logstmt += "Unknown Opcode Read";
+			logstmt += fmt::format("Unknown Opcode Read {:X}",opcode);
 			programCounter += 2;
 		}
 	}
@@ -144,9 +193,8 @@ void Chocolate::_00E0(){
 			pixels[i][j] = false;
 		}
 	}
-	//TODO: More verbose logging, build a useful string
 	
-	logstmt +=  "Screen Cleared";
+	logstmt += "Screen Cleared";
 	programCounter += 2;
 }
 
@@ -184,6 +232,7 @@ void Chocolate::_1NNN(unsigned short opcode){
 	* However if they are not in the last few digits they must be bit shifted
 	*/
 	unsigned short address = (opcode & 0x0FFF);
+	logstmt += fmt::format("Jumping to address: {:X}",address);
 	//logstmt << "Jumping to: " << std::hex << address << std::dec;
 	programCounter = address;
 }
@@ -240,6 +289,7 @@ void Chocolate::_3XNN(unsigned short opcode){
  */
 void Chocolate::_4XNN(unsigned short opcode){
 	logstmt += fmt::format("(4XNN : {:X}) ",opcode & 0xFFFF);
+
 	int index = (opcode & 0x0F00) >> 8;
 	int val = opcode & 0x00FF;
 	int regNum = registers[index];
@@ -268,6 +318,8 @@ void Chocolate::_4XNN(unsigned short opcode){
  *
  */
 void Chocolate::_5XY0(unsigned short opcode){
+	logstmt += fmt::format("(5XY0 : {:X}) ",opcode & 0xFFFF);
+
 	int x = (opcode & 0x0F00) >> 8;
 	int y = (opcode & 0x00F0) >> 4;
 
@@ -289,6 +341,8 @@ void Chocolate::_5XY0(unsigned short opcode){
  *
  */
 void Chocolate::_6XNN(unsigned short opcode){
+	logstmt += fmt::format("(6XNN : {:X}) ",opcode & 0xFFFF);
+
 	int index = (opcode & 0x0F00) >> 8;
 	int val = opcode & 0x00FF;
 	
@@ -305,6 +359,8 @@ void Chocolate::_6XNN(unsigned short opcode){
  *              NN: The amount to add
  */
 void Chocolate::_7XNN(unsigned short opcode){
+	logstmt += fmt::format("(7XNN : {:X}) ",opcode & 0xFFFF);
+
 	int index = (opcode & 0x0F00) >> 8;
 	unsigned char add = opcode & 0x00FF;
 	registers[index] += add;
@@ -319,6 +375,8 @@ void Chocolate::_7XNN(unsigned short opcode){
  *               y: the second register
  */
 void Chocolate::_8XY0(unsigned short opcode){
+	logstmt += fmt::format("(8XY0 : {:X}) ",opcode & 0xFFFF);
+
 	int xIndex = (opcode & 0x0F00) >> 8;
 	int yIndex = (opcode & 0x00F0) >> 4;
 
@@ -337,6 +395,8 @@ void Chocolate::_8XY0(unsigned short opcode){
  *               y: the second register
  */
 void Chocolate::_8XY1(unsigned short opcode){
+	logstmt += fmt::format("(8XY1 : {:X}) ",opcode & 0xFFFF);
+
 	int xIndex = (opcode & 0x0F00) >> 8;
 	int yIndex = (opcode & 0x00F0) >> 4;
 
@@ -357,6 +417,8 @@ void Chocolate::_8XY1(unsigned short opcode){
  *               y: the second register
  */
 void Chocolate::_8XY2(unsigned short opcode){
+	logstmt += fmt::format("(8XY2 : {:X}) ",opcode & 0xFFFF);
+
 	int xIndex = (opcode & 0x0F00) >> 8;
 	int yIndex = (opcode & 0x00F0) >> 4;
 
@@ -377,6 +439,8 @@ void Chocolate::_8XY2(unsigned short opcode){
  *               y: the second register
  */
 void Chocolate::_8XY3(unsigned short opcode){
+	logstmt += fmt::format("(8XY3 : {:X}) ",opcode & 0xFFFF);
+
 	int xIndex = (opcode & 0x0F00) >> 8;
 	int yIndex = (opcode & 0x00F0) >> 4;
 
@@ -399,6 +463,8 @@ void Chocolate::_8XY3(unsigned short opcode){
  */       
 
 void Chocolate::_8XY4(unsigned short opcode){
+	logstmt += fmt::format("(8XY4 : {:X}) ",opcode & 0xFFFF);
+
 	int xIndex = (opcode & 0x0F00) >> 8;
 	int yIndex = (opcode & 0x00F0) >> 4;
 
@@ -424,6 +490,8 @@ void Chocolate::_8XY4(unsigned short opcode){
  * @param opcode 
  */
 void Chocolate::_8XY5(unsigned short opcode){
+	logstmt += fmt::format("(8XY5 : {:X}) ",opcode & 0xFFFF);
+
 	int xIndex = (opcode & 0x0F00) >> 8;
 	int yIndex = (opcode & 0x00F0) >> 4;
 
@@ -449,6 +517,8 @@ void Chocolate::_8XY5(unsigned short opcode){
  * @param opcode 
  */
 void Chocolate::_8XY6(unsigned short opcode){
+	logstmt += fmt::format("(8XY6 : {:X}) ",opcode & 0xFFFF);
+
 	int xIndex = (opcode & 0x0F00) >> 8;
 	int yIndex = (opcode & 0x00F0) >> 4;
 
@@ -464,6 +534,8 @@ void Chocolate::_8XY6(unsigned short opcode){
  * @param opcode 
  */
 void Chocolate::_8XY7(unsigned short opcode){
+	logstmt += fmt::format("(8XY7 : {:X}) ",opcode & 0xFFFF);
+
 	int xIndex = (opcode & 0x0F00) >> 8;
 	int yIndex = (opcode & 0x00F0) >> 4;
 
@@ -483,8 +555,9 @@ void Chocolate::_8XY7(unsigned short opcode){
 }
 
 void Chocolate::_8XYE(unsigned short opcode){
+	logstmt += fmt::format("(8XYE : {:X}) ",opcode & 0xFFFF);
+
 	int xIndex = (opcode & 0x0F00) >> 8;
-	int yIndex = (opcode & 0x00F0) >> 4;
 
 	registers[0xF] = registers[xIndex] >> 7;
 	registers[xIndex] <<= 1;
@@ -494,6 +567,8 @@ void Chocolate::_8XYE(unsigned short opcode){
 }
 
 void Chocolate::_9XY0(unsigned short opcode){
+	logstmt += fmt::format("(9XY0 : {:X}) ",opcode & 0xFFFF);
+
 	int xIndex = (opcode & 0x0F00) >> 8;
 	int yIndex = (opcode & 0x00F0) >> 4;
 
@@ -511,6 +586,13 @@ void Chocolate::_9XY0(unsigned short opcode){
 }
 
 void Chocolate::_ANNN(unsigned short opcode){
+	logstmt += fmt::format("(ANNN : {:X}) ",opcode & 0xFFFF);
+
+	unsigned char addr = opcode & 0x0FFF;
+
+	address = addr; 
+
+	programCounter += 2;
 
 }
 
@@ -519,10 +601,41 @@ void Chocolate::_BNNN(unsigned short opcode){
 }
 
 void Chocolate::_CXNN(unsigned short opcode){
+	logstmt += fmt::format("(CXNN : {:X}) ",opcode & 0xFFFF);
 
+	int index = (opcode & 0x0F00) >> 8;
+	unsigned char mask = (opcode & 0x00FF);
+
+	registers[index] = rand() & mask; 
+
+	programCounter += 2;
 }
 
 void Chocolate::_DXYN(unsigned short opcode){
+	logstmt += fmt::format("(DXYN : {:X}) ",opcode & 0xFFFF);
+
+	int x = (opcode & 0x0F00) >> 8;
+	int y = (opcode & 0x00F0) >> 4;
+	int xPos = registers[x];
+	int yPos = registers[y];
+	int n = opcode & 0x000F;
+	int memoryPos = address;
+	bool changed = false;
+
+	for(int row = yPos; row < yPos + n; row++) {
+		int column = xPos;
+		for(int j = 7; j >= 0; j--) {
+			bool set = (memory[memoryPos] & (1 << j)) > 0;
+			if(pixels[column][row] && !set)
+				changed = true;
+			pixels[column][row] = set;
+			column++;
+		}
+		memoryPos++;
+	}
+	registers[0xF] = changed ? 1 : 0;
+
+	programCounter += 2;
 
 }
 

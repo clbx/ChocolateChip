@@ -11,12 +11,12 @@ int main()
 	// Load CHIP-8 buzzer sound
 
 
-	char* rom = (char*)"rom/t";
+	char rom[64]; //= (char*)"rom/t";
 
-	/*
+	
 	printf("Enter ROM file path: ");
 	scanf("%s",rom);
-	*/
+	
 
 
 	sf::SoundBuffer buffer;
@@ -77,6 +77,8 @@ int main()
 		// Let the CHIP-8 process events and render graphics to its buffer
 		getchar();
 		chip8.tick();
+
+		printf("\033c");
 		std::string* log = chip8.logger.get(5);
 		for(int i = 0; i < 5; i ++){
 			std::cout << log[i] << std::endl;
