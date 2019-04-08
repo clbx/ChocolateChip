@@ -11,7 +11,8 @@ class Chocolate
 		Chocolate();
 		void reset();
 		void tick();
-		bool getPixel(int, int);
+		bool getPixel(int);
+		void setPixel(int,int,bool);
 		void setKey(int, bool);
 		bool getKey(int);
 		bool isBuzzer();
@@ -69,7 +70,7 @@ class Chocolate
 
 		bool keyStates[16]; // true for pressed, false for unpressed
 
-		bool pixels[64][32];
+		bool pixels[2048];
 
 		std::string logstmt;
 };

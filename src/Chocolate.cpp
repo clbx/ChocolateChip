@@ -51,7 +51,7 @@ void Chocolate::reset()
 
 	buzzer = false;
 
-	memset(pixels, 0, 64*32);
+	memset(pixels, 0, 2048);
 
 	logstmt = "";
 
@@ -190,7 +190,7 @@ void Chocolate::_00E0(){
 
 	for(int i = 0; i < 64; i++){
 		for(int j = 0; j < 64; j++){
-			pixels[i][j] = false;
+			setPixel(i,j,false);
 		}
 	}
 	
@@ -613,7 +613,7 @@ void Chocolate::_CXNN(unsigned short opcode){
 
 void Chocolate::_DXYN(unsigned short opcode){
 	logstmt += fmt::format("(DXYN : {:X}) ",opcode & 0xFFFF);
-
+	/*
 	int x = (opcode & 0x0F00) >> 8;
 	int y = (opcode & 0x00F0) >> 4;
 	int xPos = registers[x];
@@ -629,11 +629,32 @@ void Chocolate::_DXYN(unsigned short opcode){
 			if(pixels[column][row] && !set)
 				changed = true;
 			pixels[column][row] = set;
-			column++;
+	  		column++;
 		}
 		memoryPos++;
 	}
 	registers[0xF] = changed ? 1 : 0;
+
+	*/
+
+	unsigned short x = registers[(opcode & 0x0F00) >> 8];
+	unsigned short y = registers[(opcode & 0x00F0) >> 8];
+	unsigned short height = opcode & 0x000F;
+	unsigned short pixel;
+
+	logstmt += fmt::format("Addr: {:X} ",address);
+
+	registers[0xF] = 0;
+	for(int i = 0; i < height; i++){
+		pixel = memory[address + i];
+		for(int j = 0; j < 8; j++){
+			logstmt += fmt::format("Pixel: {:X} ",pixel);
+			bool set = (memory[address] & (1 << j)) > 0;
+
+			pixels[i + 64*j] = set;
+
+		}
+	}
 
 	programCounter += 2;
 
@@ -696,13 +717,15 @@ Functions that are commonly used
 ************************************/
 
 
-bool Chocolate::getPixel(int x, int y)
-{
-	return pixels[x][y];
+bool Chocolate::getPixel(int x){
+	return pixels[x];
 }
 
-void Chocolate::setKey(int key, bool isPressed)
-{
+void Chocolate::setPixel(int x, int y, bool value){
+	pixels[x + 64*y] = value;
+}
+
+void Chocolate::setKey(int key, bool isPressed){
 	keyStates[key] = isPressed;
 }
 
@@ -712,7 +735,6 @@ bool Chocolate::getKey(int key){
 	return 0;
 }
 
-bool Chocolate::isBuzzer()
-{
+bool Chocolate::isBuzzer(){
 	return buzzer;
 }

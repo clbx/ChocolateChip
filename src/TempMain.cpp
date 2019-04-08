@@ -7,11 +7,14 @@ using namespace std;
 
 int main(){
 
-    unsigned char a = 0x0001;
-    unsigned char b = 0x0001;
+    bool pixels[2048];
+    for(int i =0 ; i < 2048; i++){
+        pixels[i] = false;
+    }
 
-    int c = a + b;
-    printf("%d",c);
+    
+
+
 
 	
 }

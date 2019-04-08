@@ -89,6 +89,17 @@ int main()
 
 		// Draw all pixels from CHIP-8 graphics buffer
 		// TODO: Fix this, no need to redraw the scren after every tick only on 0x00E0 and 0xDXYN
+		
+
+		//i = x + width*y
+		for(int i = 0; i < 2048; i++){
+			if(chip8.getPixel(i)){
+				pixel.setPosition((i%64),(i/64));
+				window.draw(pixel);
+			}
+		}
+
+		/*
 		for (int x = 0; x < 64; x++) {
 			for (int y = 0; y < 32; y++) {
 				if (chip8.getPixel(x, y)) {
@@ -96,7 +107,7 @@ int main()
 					window.draw(pixel);
 				}
 			}
-		}
+		}*/
 
 		// Display changes
 		window.display();
