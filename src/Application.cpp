@@ -26,7 +26,7 @@ int main()
 	}
 	sf::Sound beep;
 	beep.setBuffer(buffer);
-	beep.play(); // Startup test beep (why not?)
+	//beep.play(); // Startup test beep (why not?)
 
 
 

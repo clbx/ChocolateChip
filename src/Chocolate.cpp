@@ -215,10 +215,8 @@ Opcodes
 void Chocolate::_00E0(){
 	logstmt += "(00E0 : 00E0) ";
 
-	for(int i = 0; i < 64; i++){
-		for(int j = 0; j < 64; j++){
-			setPixel(i,j,false);
-		}
+	for(int i = 0; i < 2048; i++){
+		pixels[i] = 0;
 	}
 	
 	logstmt += "Screen Cleared";
@@ -643,26 +641,22 @@ void Chocolate::_DXYN(unsigned short opcode){
 
 
 	unsigned short x = registers[(opcode & 0x0F00) >> 8];
-            unsigned short y = registers[(opcode & 0x00F0) >> 4];
-            unsigned short height = opcode & 0x000F;
-            unsigned short pixel;
+    unsigned short y = registers[(opcode & 0x00F0) >> 4];
+    unsigned short height = opcode & 0x000F;
+    unsigned short pixel;
 
-            registers[0xF] = 0;
-            for (int yline = 0; yline < height; yline++)
-            {
-                pixel = memory[address + yline];
-                for(int xline = 0; xline < 8; xline++)
-                {
-                    if((pixel & (0x80 >> xline)) != 0)
-                    {
-                        if(pixels[(x + xline + ((y + yline) * 64))] == 1)
-                        {
-                            registers[0xF] = 1;
-                        }
-                        pixels[x + xline + ((y + yline) * 64)] ^= 1;
-                    }
+    registers[0xF] = 0;
+    for (int yline = 0; yline < height; yline++){
+        pixel = memory[address + yline];
+        for(int xline = 0; xline < 8; xline++){
+            if((pixel & (0x80 >> xline)) != 0){
+                if(pixels[(x + xline + ((y + yline) * 64))] == 1){
+                    registers[0xF] = 1;
                 }
+                pixels[x + xline + ((y + yline) * 64)] ^= 1;
             }
+        }
+    }
 
     programCounter += 2;
 
