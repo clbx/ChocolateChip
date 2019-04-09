@@ -6,6 +6,25 @@
 #include <cstring>
 
 
+unsigned char chip8_fontset[80] = {
+    0xF0, 0x90, 0x90, 0x90, 0xF0, //0
+    0x20, 0x60, 0x20, 0x20, 0x70, //1
+    0xF0, 0x10, 0xF0, 0x80, 0xF0, //2
+    0xF0, 0x10, 0xF0, 0x10, 0xF0, //3
+    0x90, 0x90, 0xF0, 0x10, 0x10, //4
+    0xF0, 0x80, 0xF0, 0x10, 0xF0, //5
+    0xF0, 0x80, 0xF0, 0x90, 0xF0, //6
+    0xF0, 0x10, 0x20, 0x40, 0x40, //7
+    0xF0, 0x90, 0xF0, 0x90, 0xF0, //8
+    0xF0, 0x90, 0xF0, 0x10, 0xF0, //9
+    0xF0, 0x90, 0xF0, 0x90, 0x90, //A
+    0xE0, 0x90, 0xE0, 0x90, 0xE0, //B
+    0xF0, 0x80, 0x80, 0x80, 0xF0, //C
+    0xE0, 0x90, 0x90, 0x90, 0xE0, //D
+    0xF0, 0x80, 0xF0, 0x80, 0xF0, //E
+    0xF0, 0x80, 0xF0, 0x80, 0x80  //F
+};
+
 Chocolate::Chocolate(const char gameFile[])
 {
 	reset();
@@ -35,6 +54,7 @@ Chocolate::Chocolate() //For Testing Purposes Only
 
 
 
+
 void Chocolate::reset()
 {
 	memset(memory, 0, sizeof(memory));
@@ -52,6 +72,13 @@ void Chocolate::reset()
 	buzzer = false;
 
 	memset(pixels, 0, 2048);
+
+	//Load font into memory
+
+
+	for(int i = 0; i < 80; i++){
+		memory[i] = chip8_fontset[i];
+	}
 
 	logstmt = "";
 
@@ -613,50 +640,31 @@ void Chocolate::_CXNN(unsigned short opcode){
 
 void Chocolate::_DXYN(unsigned short opcode){
 	logstmt += fmt::format("(DXYN : {:X}) ",opcode & 0xFFFF);
-	/*
-	int x = (opcode & 0x0F00) >> 8;
-	int y = (opcode & 0x00F0) >> 4;
-	int xPos = registers[x];
-	int yPos = registers[y];
-	int n = opcode & 0x000F;
-	int memoryPos = address;
-	bool changed = false;
 
-	for(int row = yPos; row < yPos + n; row++) {
-		int column = xPos;
-		for(int j = 7; j >= 0; j--) {
-			bool set = (memory[memoryPos] & (1 << j)) > 0;
-			if(pixels[column][row] && !set)
-				changed = true;
-			pixels[column][row] = set;
-	  		column++;
-		}
-		memoryPos++;
-	}
-	registers[0xF] = changed ? 1 : 0;
-
-	*/
 
 	unsigned short x = registers[(opcode & 0x0F00) >> 8];
-	unsigned short y = registers[(opcode & 0x00F0) >> 8];
-	unsigned short height = opcode & 0x000F;
-	unsigned short pixel;
+            unsigned short y = registers[(opcode & 0x00F0) >> 4];
+            unsigned short height = opcode & 0x000F;
+            unsigned short pixel;
 
-	logstmt += fmt::format("Addr: {:X} ",address);
+            registers[0xF] = 0;
+            for (int yline = 0; yline < height; yline++)
+            {
+                pixel = memory[address + yline];
+                for(int xline = 0; xline < 8; xline++)
+                {
+                    if((pixel & (0x80 >> xline)) != 0)
+                    {
+                        if(pixels[(x + xline + ((y + yline) * 64))] == 1)
+                        {
+                            registers[0xF] = 1;
+                        }
+                        pixels[x + xline + ((y + yline) * 64)] ^= 1;
+                    }
+                }
+            }
 
-	registers[0xF] = 0;
-	for(int i = 0; i < height; i++){
-		pixel = memory[address + i];
-		for(int j = 0; j < 8; j++){
-			logstmt += fmt::format("Pixel: {:X} ",pixel);
-			bool set = (memory[address] & (1 << j)) > 0;
-
-			pixels[i + 64*j] = set;
-
-		}
-	}
-
-	programCounter += 2;
+    programCounter += 2;
 
 }
 
