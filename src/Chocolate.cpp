@@ -613,7 +613,7 @@ void Chocolate::_9XY0(unsigned short opcode){
 void Chocolate::_ANNN(unsigned short opcode){
 	logstmt += fmt::format("(ANNN : {:X}) ",opcode & 0xFFFF);
 
-	unsigned char addr = opcode & 0x0FFF;
+	unsigned short addr = opcode & 0x0FFF;
 
 	address = addr; 
 
@@ -646,7 +646,7 @@ void Chocolate::_DXYN(unsigned short opcode){
 
     registers[0xF] = 0;
     for (int yline = 0; yline < height; yline++){
-        pixel = memory[address + yline + 0x200];
+        pixel = memory[address + yline];
         for(int xline = 0; xline < 8; xline++){
             if((pixel & (0x80 >> xline)) != 0){
                 if(pixels[(x + xline + ((y + yline) * 64))] == 1){
