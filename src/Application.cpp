@@ -1,7 +1,7 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
-
+#include <fmt/core.h>
 #include "Chocolate.hpp"
 
 int convertKeycode(sf::Keyboard::Key);
@@ -75,11 +75,19 @@ int main()
 			chip8.setKey(i, keyState[i]);
 
 		// Let the CHIP-8 process events and render graphics to its buffer
-		getchar();
+		//getchar();
 		chip8.tick();
 
 		printf("\033c");
+
+		for(int i = 0; i < 4096; i++){
+			std::cout << fmt::format("{:X}",chip8.memory[i]);
+		}
+		std::cout << std::endl;
+
 		std::string* log = chip8.logger.get(5);
+		std::cout << fmt::format("{:X}",chip8.getAddress()) << std::endl;
+
 		for(int i = 0; i < 5; i ++){
 			std::cout << log[i] << std::endl;
 		}
@@ -123,6 +131,8 @@ int main()
 // Converts an SFML keycode to a CHIP-8 hexadecimal keycode. Returns -1 if the SFML keycode has no CHIP-8 equivalent.
 int convertKeycode(sf::Keyboard::Key key)
 {
+
+
 	switch (key) {
 	// Row 0
 	case sf::Keyboard::Num1: return 0x1;

@@ -12,10 +12,10 @@ unsigned char chip8_fontset[80] = {
     0xF0, 0x10, 0xF0, 0x80, 0xF0, //2
     0xF0, 0x10, 0xF0, 0x10, 0xF0, //3
     0x90, 0x90, 0xF0, 0x10, 0x10, //4
-    0xF0, 0x80, 0xF0, 0x10, 0xF0, //5
-    0xF0, 0x80, 0xF0, 0x90, 0xF0, //6
-    0xF0, 0x10, 0x20, 0x40, 0x40, //7
-    0xF0, 0x90, 0xF0, 0x90, 0xF0, //8
+	0xF0, 0x80, 0xF0, 0x10, 0xF0, //5
+	0xF0, 0x80, 0xF0, 0x90, 0xF0, //6    
+	0xF0, 0x10, 0x20, 0x40, 0x40, //7
+	0xF0, 0x90, 0xF0, 0x90, 0xF0, //8
     0xF0, 0x90, 0xF0, 0x10, 0xF0, //9
     0xF0, 0x90, 0xF0, 0x90, 0x90, //A
     0xE0, 0x90, 0xE0, 0x90, 0xE0, //B
@@ -63,7 +63,7 @@ void Chocolate::reset()
 	memset(keyStates, 0, sizeof(keyStates));
 
 	stackPointer = 0;
-	address = 0;
+	address = 200;
 	programCounter = 0x200;
 
 	delayTimer = 0;
@@ -639,7 +639,6 @@ void Chocolate::_CXNN(unsigned short opcode){
 void Chocolate::_DXYN(unsigned short opcode){
 	logstmt += fmt::format("(DXYN : {:X}) ",opcode & 0xFFFF);
 
-
 	unsigned short x = registers[(opcode & 0x0F00) >> 8];
     unsigned short y = registers[(opcode & 0x00F0) >> 4];
     unsigned short height = opcode & 0x000F;
@@ -647,7 +646,7 @@ void Chocolate::_DXYN(unsigned short opcode){
 
     registers[0xF] = 0;
     for (int yline = 0; yline < height; yline++){
-        pixel = memory[address + yline];
+        pixel = memory[address + yline + 0x200];
         for(int xline = 0; xline < 8; xline++){
             if((pixel & (0x80 >> xline)) != 0){
                 if(pixels[(x + xline + ((y + yline) * 64))] == 1){
@@ -718,6 +717,9 @@ AUXILLARY FUNCTIONS
 Functions that are commonly used 
 ************************************/
 
+int Chocolate::getAddress(){
+	return address;
+}
 
 bool Chocolate::getPixel(int x){
 	return pixels[x];

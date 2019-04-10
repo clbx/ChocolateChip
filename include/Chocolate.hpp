@@ -16,6 +16,9 @@ class Chocolate
 		void setKey(int, bool);
 		bool getKey(int);
 		bool isBuzzer();
+		int getAddress();
+		unsigned char memory[4096];
+
 
 		//Opcodes
 		void _00E0();
@@ -55,7 +58,6 @@ class Chocolate
 
 
 	private:
-		unsigned char memory[4096];
 		unsigned char registers[16];
 		unsigned short stack[16];
 		int stackPointer;
