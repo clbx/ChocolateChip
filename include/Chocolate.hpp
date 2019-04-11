@@ -18,6 +18,9 @@ class Chocolate
 		bool isBuzzer();
 		int getAddress();
 		unsigned char memory[4096];
+		unsigned char registers[16];
+		unsigned short stack[16];
+		int stackPointer;
 
 
 		//Opcodes
@@ -58,9 +61,8 @@ class Chocolate
 
 
 	private:
-		unsigned char registers[16];
-		unsigned short stack[16];
-		int stackPointer;
+		
+		
 		unsigned short address; // I
 		unsigned short programCounter;
 

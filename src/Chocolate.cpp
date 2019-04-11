@@ -348,10 +348,16 @@ void Chocolate::_5XY0(unsigned short opcode){
 	int x = (opcode & 0x0F00) >> 8;
 	int y = (opcode & 0x00F0) >> 4;
 
-	if(registers[x] == registers[y]){
+	unsigned char xVal = registers[x];
+	unsigned char yVal = registers[y];
+
+
+	if(xVal == yVal){
+		logstmt += fmt::format("V[{}] = {:X} == V[{}] = {:X} Skipping Next Instruction",x,xVal,y,yVal);
 		programCounter += 4;
 	}
 	else{
+		logstmt += fmt::format("V[{}] = {:X} != V[{}] = {:X} Continuing",x,xVal,y,yVal);
 		programCounter += 2;
 	}	
 }
@@ -371,6 +377,8 @@ void Chocolate::_6XNN(unsigned short opcode){
 	int index = (opcode & 0x0F00) >> 8;
 	int val = opcode & 0x00FF;
 	
+	logstmt += fmt::format("V[{}] = {:X}",index,val);
+
 	registers[index] = val;
 
 	programCounter += 2;
@@ -388,6 +396,7 @@ void Chocolate::_7XNN(unsigned short opcode){
 
 	int index = (opcode & 0x0F00) >> 8;
 	unsigned char add = opcode & 0x00FF;
+	logstmt += fmt::format("V[{}] += {}",index,add);
 	registers[index] += add;
 
 	programCounter += 2;
@@ -404,6 +413,8 @@ void Chocolate::_8XY0(unsigned short opcode){
 
 	int xIndex = (opcode & 0x0F00) >> 8;
 	int yIndex = (opcode & 0x00F0) >> 4;
+
+	logstmt += fmt::format("V[{}] = V[{}",xIndex,yIndex);
 
 	unsigned char yVal = registers[yIndex];
 
@@ -615,6 +626,7 @@ void Chocolate::_ANNN(unsigned short opcode){
 
 	unsigned short addr = opcode & 0x0FFF;
 
+	logstmt += fmt::format("I = {:X}",addr);
 	address = addr; 
 
 	programCounter += 2;
@@ -630,8 +642,10 @@ void Chocolate::_CXNN(unsigned short opcode){
 
 	int index = (opcode & 0x0F00) >> 8;
 	unsigned char mask = (opcode & 0x00FF);
+	unsigned char val = rand() & mask;
+	logstmt += fmt::format("Setting V[{:X}] to random value {}, Mask {}",index,val,mask);
 
-	registers[index] = rand() & mask; 
+	registers[index] = val; 
 
 	programCounter += 2;
 }
@@ -643,6 +657,8 @@ void Chocolate::_DXYN(unsigned short opcode){
     unsigned short y = registers[(opcode & 0x00F0) >> 4];
     unsigned short height = opcode & 0x000F;
     unsigned short pixel;
+
+	logstmt += fmt::format("Drawing sprite from I={}, At ({},{}) Height {}",address,x,y,height);
 
     registers[0xF] = 0;
     for (int yline = 0; yline < height; yline++){

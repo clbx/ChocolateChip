@@ -12,10 +12,26 @@ int main()
 
 
 	char rom[64]; //= (char*)"rom/t";
+	char inDebug = 'y';
+	char inManual = 'y';
+	bool debug = true;
+	bool manual = true;
 
 	
 	printf("Enter ROM file path: ");
 	scanf("%s",rom);
+	printf("Manual Clock? (y/n) ");
+	scanf(" %c", &inManual);
+	printf("Debug? (y/n) ");
+	scanf(" %c", &inDebug);
+
+	if(inManual == 'n'){
+		manual = false;
+	}
+
+	if(inDebug == 'n'){
+		debug = false;
+	}
 	
 
 
@@ -75,21 +91,34 @@ int main()
 			chip8.setKey(i, keyState[i]);
 
 		// Let the CHIP-8 process events and render graphics to its buffer
-		//getchar();
+		
+		if(manual){
+			getchar();
+		}
+
 		chip8.tick();
 
-		printf("\033c");
+		if(debug){
+			printf("\033c");
+			std::cout << fmt::format("0    1    2    3    4    5    6    7    8    9    A    B    C    D    E    F") << std::endl;
+			for(int i = 0; i < 0x10; i++){
+				std::cout << fmt::format("[{:02X}] ",chip8.registers[i]);
+			}
+			std::cout << std::endl;
 
-		for(int i = 0; i < 4096; i++){
-			std::cout << fmt::format("{:X}",chip8.memory[i]);
-		}
-		std::cout << std::endl;
+			std::string* log = chip8.logger.get(5);
+			std::cout << fmt::format("{:X}",chip8.getAddress()) << std::endl;
 
-		std::string* log = chip8.logger.get(5);
-		std::cout << fmt::format("{:X}",chip8.getAddress()) << std::endl;
+			for(int i = 0; i < 5; i ++){
+				std::cout << log[i] << std::endl;
+			}
 
-		for(int i = 0; i < 5; i ++){
-			std::cout << log[i] << std::endl;
+			std::cout << chip8.stackPointer << std::endl;
+
+			for(int i = 0; i < chip8.stackPointer; i++){
+				std::cout << chip8.stack[i] << std::endl;
+			}
+
 		}
 
 		// Set the screen back to black (we do this every frame before redrawing everything)
