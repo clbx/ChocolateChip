@@ -521,9 +521,10 @@ void Chocolate::_8XY4(unsigned short opcode){
 }
 
 /**
- * @brief 
+ * @brief V[x] -= V[y]
  * 
- * @param opcode 
+ * @param opcode x: the first register
+ *               y: the second register
  */
 void Chocolate::_8XY5(unsigned short opcode){
 	logstmt += fmt::format("(8XY5 : {:X}) ",opcode & 0xFFFF);
