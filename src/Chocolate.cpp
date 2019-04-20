@@ -208,6 +208,12 @@ void Chocolate::tick()
 				case 0x0007:{
 					_FX07(opcode);
 				}break;
+				case 0x000A:{
+					_FX0A(opcode);
+				}break;
+				case 0x0015:{
+					_FX15(opcode);
+				}break;
 				case 0x001E:{
 					_FX1E(opcode);
 				}break;
@@ -444,7 +450,7 @@ void Chocolate::_8XY0(unsigned short opcode){
 	int xIndex = (opcode & 0x0F00) >> 8;
 	int yIndex = (opcode & 0x00F0) >> 4;
 
-	logstmt += fmt::format("V[{}] = V[{}",xIndex,yIndex);
+	logstmt += fmt::format("V[{}] = V[{}]",xIndex,yIndex);
 
 	unsigned char yVal = V[yIndex];
 
@@ -721,7 +727,7 @@ void Chocolate::_DXYN(unsigned short opcode){
 void Chocolate::_EX9E(unsigned short opcode){
 	logstmt += fmt::format("(EX9E : {:X}) ",opcode & 0xFFFF);
 
-	unsigned short reg = (opcode & 0x0F00) >> 8;
+	unsigned char reg = (opcode & 0x0F00) >> 8;
 	bool key = keyStates[reg];
 
 	if(key){
@@ -735,7 +741,7 @@ void Chocolate::_EX9E(unsigned short opcode){
 void Chocolate::_EXA1(unsigned short opcode){
 	logstmt += fmt::format("(EXA1 : {:X}) ",opcode & 0xFFFF);
 
-	unsigned short reg = (opcode & 0x0F00) >> 8;
+	unsigned char reg = (opcode & 0x0F00) >> 8;
 	bool key = keyStates[reg];
 
 	if(!key){
@@ -749,7 +755,7 @@ void Chocolate::_EXA1(unsigned short opcode){
 void Chocolate::_FX07(unsigned short opcode){
 	logstmt += fmt::format("(FX07 : {:X}) ",opcode & 0xFFFF);
 
-	unsigned short reg = (opcode & 0x0F00) >> 8;
+	unsigned char reg = (opcode & 0x0F00) >> 8;
 	
 	V[reg] = delayTimer;
 
@@ -757,12 +763,33 @@ void Chocolate::_FX07(unsigned short opcode){
 }
 
 void Chocolate::_FX0A(unsigned short opcode){
+	logstmt += fmt::format("(FX0A : {:X}) ",opcode & 0xFFFF);
+
+	bool pressed = false;
+	unsigned char reg = (opcode & 0x0F00) >> 8;
 
 
+	for(int i = 0; i < 16; i++){
+		if(keyStates[i]){
+			logstmt += fmt::format("Got keypress");
+			V[reg] = i;
+			pressed = true;
+		}
+	}
+	if(pressed){
+		programCounter += 2;
+	}
 }
 
 void Chocolate::_FX15(unsigned short opcode){
+	logstmt += fmt::format("(FX0A : {:X}) ",opcode & 0xFFFF);
 
+	unsigned char reg = (opcode & 0x0F00) >> 8;
+	unsigned char val = V[reg];
+
+	delayTimer = val;
+
+	programCounter += 2;
 }
 
 void Chocolate::_FX18(unsigned short opcode){
@@ -773,8 +800,8 @@ void Chocolate::_FX18(unsigned short opcode){
 void Chocolate::_FX1E(unsigned short opcode){
 	logstmt += fmt::format("(FX1E : {:X}) ",opcode & 0xFFFF);
 
-	unsigned short reg = (opcode & 0x0F00) >> 8;
-	unsigned short val = V[reg];
+	unsigned char reg = (opcode & 0x0F00) >> 8;
+	unsigned char val = V[reg];
 
 	if((val + I) > 0xFFF){
 		V[0xF] = 1;
@@ -800,7 +827,7 @@ void Chocolate::_FX33(unsigned short opcode){
 void Chocolate::_FX55(unsigned short opcode){
 	logstmt += fmt::format("(FX1E : {:X}) ",opcode & 0xFFFF);
 
-	unsigned short limit = (opcode & 0x0F00) >> 8;
+	unsigned char limit = (opcode & 0x0F00) >> 8;
 
 	for(int i = 0; i <= limit; i++){
 		memory[I + i] = V[i];
@@ -815,7 +842,7 @@ void Chocolate::_FX55(unsigned short opcode){
 void Chocolate::_FX65(unsigned short opcode){
 	logstmt += fmt::format("(FX65 : {:X}) ",opcode & 0xFFFF);
 
-	unsigned short limit = (opcode & 0x0F00) >> 8;
+	unsigned char limit = (opcode & 0x0F00) >> 8;
 
 	for(int i = 0; i <= limit; i++){
 		V[i] = memory[I + i];

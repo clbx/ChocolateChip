@@ -22,6 +22,8 @@ class Chocolate
 		unsigned short stack[16];
 		int stackPointer;
 		bool drawFlag;
+		bool keyStates[16]; // true for pressed, false for unpressed
+
 
 		//Opcodes
 		void _00E0();
@@ -72,7 +74,6 @@ class Chocolate
 		// true following a tick where the sound timer expires
 		bool buzzer;
 
-		bool keyStates[16]; // true for pressed, false for unpressed
 
 		bool pixels[2048];
 

@@ -100,6 +100,10 @@ int main()
 
 		if(debug){
 			printf("\033c");
+			for(int i = 0; i < 16; i++){
+				std::cout << chip8.keyStates[i];
+			}
+
 			std::cout << fmt::format("0    1    2    3    4    5    6    7    8    9    A    B    C    D    E    F") << std::endl;
 			for(int i = 0; i < 0x10; i++){
 				std::cout << fmt::format("[{:02X}] ",chip8.V[i]);
