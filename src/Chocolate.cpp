@@ -96,6 +96,7 @@ void Chocolate::tick()
 	unsigned short opcode = memory[programCounter] << 8;
 	opcode |= memory[programCounter + 1];
 
+	logstmt += fmt::format("{:X}",opcode);
 	/* Here we will check the opcode received and go through digit by
 	* digit to reach the corrrect opcode
 	*
@@ -212,6 +213,9 @@ void Chocolate::tick()
 				}break;
 				case 0x0055:{
 					_FX55(opcode);
+				}break;
+				case 0x0065:{
+					_FX65(opcode);
 				}break;
 			}
 		}break;
@@ -765,15 +769,19 @@ void Chocolate::_FX18(unsigned short opcode){
 
 }
 
-//DO
+
 void Chocolate::_FX1E(unsigned short opcode){
 	logstmt += fmt::format("(FX1E : {:X}) ",opcode & 0xFFFF);
-
 
 	unsigned short reg = (opcode & 0x0F00) >> 8;
 	unsigned short val = V[reg];
 
-
+	if((val + I) > 0xFFF){
+		V[0xF] = 1;
+	}
+	else{
+		V[0xF] = 0;
+	}
 
 	I += val;
 
@@ -789,14 +797,13 @@ void Chocolate::_FX33(unsigned short opcode){
 
 }
 
-//DO
 void Chocolate::_FX55(unsigned short opcode){
 	logstmt += fmt::format("(FX1E : {:X}) ",opcode & 0xFFFF);
 
 	unsigned short limit = (opcode & 0x0F00) >> 8;
 
-	for(int i = 0; i < limit; i++){
-		V[i] = memory[I + i];
+	for(int i = 0; i <= limit; i++){
+		memory[I + i] = V[i];
 	}
 
 	I += limit + 1;
@@ -806,6 +813,17 @@ void Chocolate::_FX55(unsigned short opcode){
 }
 
 void Chocolate::_FX65(unsigned short opcode){
+	logstmt += fmt::format("(FX65 : {:X}) ",opcode & 0xFFFF);
+
+	unsigned short limit = (opcode & 0x0F00) >> 8;
+
+	for(int i = 0; i <= limit; i++){
+		V[i] = memory[I + i];
+	}
+
+	I += limit + 1;
+
+	programCounter += 2;
 
 }
 
