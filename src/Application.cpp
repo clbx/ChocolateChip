@@ -102,7 +102,7 @@ int main()
 			printf("\033c");
 			std::cout << fmt::format("0    1    2    3    4    5    6    7    8    9    A    B    C    D    E    F") << std::endl;
 			for(int i = 0; i < 0x10; i++){
-				std::cout << fmt::format("[{:02X}] ",chip8.registers[i]);
+				std::cout << fmt::format("[{:02X}] ",chip8.V[i]);
 			}
 			std::cout << std::endl;
 
@@ -120,20 +120,22 @@ int main()
 			}
 
 		}
+		if(chip8.drawFlag){
+			// Set the screen back to black (we do this every frame before redrawing everything)
+			window.clear(sf::Color::Black);
 
-		// Set the screen back to black (we do this every frame before redrawing everything)
-		window.clear(sf::Color::Black);
-
-		// Draw all pixels from CHIP-8 graphics buffer
-		// TODO: Fix this, no need to redraw the scren after every tick only on 0x00E0 and 0xDXYN
+			// Draw all pixels from CHIP-8 graphics buffer
+			// TODO: Fix this, no need to redraw the scren after every tick only on 0x00E0 and 0xDXYN
+			
 		
-
-		//i = x + width*y
-		for(int i = 0; i < 2048; i++){
-			if(chip8.getPixel(i)){
-				pixel.setPosition((i%64),(i/64));
-				window.draw(pixel);
+			//i = x + width*y
+			for(int i = 0; i < 2048; i++){
+				if(chip8.getPixel(i)){
+					pixel.setPosition((i%64),(i/64));
+					window.draw(pixel);
+				}
 			}
+			chip8.drawFlag = false;
 		}
 
 		/*

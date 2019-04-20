@@ -18,10 +18,10 @@ class Chocolate
 		bool isBuzzer();
 		int getAddress();
 		unsigned char memory[4096];
-		unsigned char registers[16];
+		unsigned char V[16];
 		unsigned short stack[16];
 		int stackPointer;
-
+		bool drawFlag;
 
 		//Opcodes
 		void _00E0();
@@ -63,11 +63,11 @@ class Chocolate
 	private:
 		
 		
-		unsigned short address; // I
+		unsigned short I;
 		unsigned short programCounter;
 
-		unsigned char delayTimer;
-		unsigned char soundTimer;
+		unsigned short delayTimer;
+		unsigned short soundTimer;
 
 		// true following a tick where the sound timer expires
 		bool buzzer;
