@@ -585,26 +585,26 @@ void Chocolate::_8XY5(unsigned short opcode){
 }
 
 /**
- * @brief 
+ * @brief Stores least signfigiant bit of V[X] in V[F] and shifts by 1
  * 
- * @param opcode 
+ * @param opcode x: the register to use
  */
 void Chocolate::_8XY6(unsigned short opcode){
 	logstmt += fmt::format("(8XY6 : {:X}) ",opcode & 0xFFFF);
 
 	int xIndex = (opcode & 0x0F00) >> 8;
-	int yIndex = (opcode & 0x00F0) >> 4;
 
 	V[0xF] = V[xIndex] & 0x1;
-	V[yIndex] >>= 1;
+	V[xIndex] >>= 1;
 
 	programCounter += 2;
 }
 
 /**
- * @brief 
+ * @brief Sets V[X] to V[X] - V[Y]. If there's a borrow V[F] is set to 0
  * 
- * @param opcode 
+ * @param opcode x: first register
+ *				 y: second register
  */
 void Chocolate::_8XY7(unsigned short opcode){
 	logstmt += fmt::format("(8XY7 : {:X}) ",opcode & 0xFFFF);
@@ -627,6 +627,12 @@ void Chocolate::_8XY7(unsigned short opcode){
 	programCounter += 2;
 }
 
+/**
+* @brief Sets the most signifigant bit of V[x] in V[F] then shifts to the left
+*
+* @param opcode x: the register to use
+*
+*/
 void Chocolate::_8XYE(unsigned short opcode){
 	logstmt += fmt::format("(8XYE : {:X}) ",opcode & 0xFFFF);
 
@@ -639,6 +645,14 @@ void Chocolate::_8XYE(unsigned short opcode){
 
 }
 
+
+/**
+* @breif Skip next instruction if V[x] != V[y]
+*
+* @param x: the first register
+*        y: the second register
+*
+*/
 void Chocolate::_9XY0(unsigned short opcode){
 	logstmt += fmt::format("(9XY0 : {:X}) ",opcode & 0xFFFF);
 
@@ -658,6 +672,13 @@ void Chocolate::_9XY0(unsigned short opcode){
 	
 }
 
+
+/**
+* @breif Sets I to NNN
+*
+* @param NNN: The address to move to
+*
+*/
 void Chocolate::_ANNN(unsigned short opcode){
 	logstmt += fmt::format("(ANNN : {:X}) ",opcode & 0xFFFF);
 
@@ -670,6 +691,12 @@ void Chocolate::_ANNN(unsigned short opcode){
 
 }
 
+/**
+* @breif Jumps to NNN + V[0]
+*
+* @param NNN: The address + V[0] to jump to
+*
+*/
 void Chocolate::_BNNN(unsigned short opcode){
 	logstmt += fmt::format("(BXNN : {:X}) ",opcode & 0xFFFF);
 
@@ -682,6 +709,12 @@ void Chocolate::_BNNN(unsigned short opcode){
 
 }
 
+/**
+* @brief Sets V[x] to a random number masked by NN
+*
+* @param X: The register to set
+*       NN: The random mask
+*/
 void Chocolate::_CXNN(unsigned short opcode){
 	logstmt += fmt::format("(CXNN : {:X}) ",opcode & 0xFFFF);
 
@@ -695,6 +728,14 @@ void Chocolate::_CXNN(unsigned short opcode){
 	programCounter += 2;
 }
 
+/**
+* @breif Draws a sprite at coords V[X] & V[Y] with a height of N.
+*        Gets the sprite data from I in memory
+*
+* @param X: The register to check for the X coord
+*        Y: The reigster to check for the Y coord
+*        N: How tall the sprite is
+*/
 void Chocolate::_DXYN(unsigned short opcode){
 	logstmt += fmt::format("(DXYN : {:X}) ",opcode & 0xFFFF);
 
@@ -724,6 +765,12 @@ void Chocolate::_DXYN(unsigned short opcode){
 
 }
 
+/**
+* @breif Skips the next instruction of the key stored in V[X] is pressed
+*
+* @param X: The register to check
+*
+*/
 void Chocolate::_EX9E(unsigned short opcode){
 	logstmt += fmt::format("(EX9E : {:X}) ",opcode & 0xFFFF);
 
@@ -738,6 +785,12 @@ void Chocolate::_EX9E(unsigned short opcode){
 	}
 }
 
+/**
+* @breif
+*
+* @param
+*
+*/
 void Chocolate::_EXA1(unsigned short opcode){
 	logstmt += fmt::format("(EXA1 : {:X}) ",opcode & 0xFFFF);
 
@@ -752,6 +805,12 @@ void Chocolate::_EXA1(unsigned short opcode){
 	}
 }
 
+/**
+* @breif
+*
+* @param
+*
+*/
 void Chocolate::_FX07(unsigned short opcode){
 	logstmt += fmt::format("(FX07 : {:X}) ",opcode & 0xFFFF);
 
@@ -762,6 +821,12 @@ void Chocolate::_FX07(unsigned short opcode){
 	programCounter += 2;
 }
 
+/**
+* @breif
+*
+* @param
+*
+*/
 void Chocolate::_FX0A(unsigned short opcode){
 	logstmt += fmt::format("(FX0A : {:X}) ",opcode & 0xFFFF);
 
@@ -781,6 +846,12 @@ void Chocolate::_FX0A(unsigned short opcode){
 	}
 }
 
+/**
+* @breif
+*
+* @param
+*
+*/
 void Chocolate::_FX15(unsigned short opcode){
 	logstmt += fmt::format("(FX0A : {:X}) ",opcode & 0xFFFF);
 
@@ -792,11 +863,30 @@ void Chocolate::_FX15(unsigned short opcode){
 	programCounter += 2;
 }
 
+/**
+* @breif
+*
+* @param
+*
+*/
 void Chocolate::_FX18(unsigned short opcode){
+	logstmt += fmt::format("(FX18 : {:X}) ",opcode & 0xFFFF);
+
+	unsigned char reg = (opcode & 0x0F00) >> 8;
+	unsigned char val = V[reg];
+
+	soundTimer = val;
+
+	programCounter += 2;
 
 }
 
-
+/**
+* @breif
+*
+* @param
+*
+*/
 void Chocolate::_FX1E(unsigned short opcode){
 	logstmt += fmt::format("(FX1E : {:X}) ",opcode & 0xFFFF);
 
@@ -816,14 +906,47 @@ void Chocolate::_FX1E(unsigned short opcode){
 
 }
 
+/**
+* @breif
+*
+* @param
+*
+*/
 void Chocolate::_FX29(unsigned short opcode){
+	logstmt += fmt::format("(FX29 : {:X}) ",opcode & 0xFFFF);
+
+	unsigned char reg = (opcode & 0x0F00) >> 8;
+	unsigned char val = V[reg];
+
+	I = val;
+
+	programCounter += 2;
 
 }
 
+/**
+* @breif
+*
+* @param
+*
+*/
 void Chocolate::_FX33(unsigned short opcode){
+	unsigned char reg = (opcode & 0x0F00) >> 8;
+	unsigned char val = V[reg];
+	
+	memory[I] = val / 100;
+	memory[I + 1] = (val / 10) % 10;
+	memory[I + 2] = val % 10;
 
+	programCounter += 2;
 }
 
+/**
+* @breif
+*
+* @param
+*
+*/
 void Chocolate::_FX55(unsigned short opcode){
 	logstmt += fmt::format("(FX1E : {:X}) ",opcode & 0xFFFF);
 
@@ -839,6 +962,12 @@ void Chocolate::_FX55(unsigned short opcode){
 
 }
 
+/**
+* @breif
+*
+* @param
+*
+*/
 void Chocolate::_FX65(unsigned short opcode){
 	logstmt += fmt::format("(FX65 : {:X}) ",opcode & 0xFFFF);
 
