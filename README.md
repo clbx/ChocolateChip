@@ -18,8 +18,9 @@ Some very useful resources:
 All ROMs in this repository are either written or from Revival Studio's ROM Pack 
 
 # Todo:
-- [ ] Implement all CHIP-8 Opcodes
-- [ ] Implement Status Panel
+- [x] Implement all CHIP-8 Opcodes
+- [x] Implement Status Panel
+- [ ] Fix a ton of bugs
 - [ ] Move from SFML to SDL
 - [ ] Create some ROMs
 - [ ] Make an Assembler
