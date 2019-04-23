@@ -233,6 +233,12 @@ void Chocolate::tick()
 	logstmt += "\n"; //Give it an endline
 	logger.store(logstmt);
 	logstmt = ("");
+
+	if(delayTimer > 0)
+		delayTimer--;
+	
+	if(soundTimer > 0)
+		soundTimer--;
 }
 
 
@@ -267,17 +273,11 @@ void Chocolate::_00E0(){
 void Chocolate::_00EE(){
 	logstmt += "(00EE : 00EE) ";
 
-	if(stackPointer != 0){
-		stackPointer--;
-		programCounter = stack[stackPointer];
-		programCounter += 2;
-		//SH = Stack Height,
-		logstmt += fmt::format("Returning from sub. SH[{}]",stackPointer);
-	}
-	else{
-		logger.store("ERROR: Stack Underflow");
-		exit(1);
-	}
+	--stackPointer;
+	programCounter = stack[stackPointer];
+	programCounter += 2;
+	//SH = Stack Height,
+	logstmt += fmt::format("Returning from sub. SH[{}]",stackPointer);
 }
 
 /** 1NNN
@@ -571,7 +571,7 @@ void Chocolate::_8XY5(unsigned short opcode){
 	unsigned char yVal = V[yIndex];
 	unsigned char xVal = V[xIndex];
 
-	V[xIndex] = yVal - xVal;
+	V[xIndex] = xVal - yVal;
 
 	if(xVal - yVal < 0xFF){
 		V[0xF] = 1;
@@ -818,6 +818,8 @@ void Chocolate::_FX07(unsigned short opcode){
 	
 	V[reg] = delayTimer;
 
+	logstmt += fmt::format("V[{:X}] = Delay Timer = {:X}",reg,delayTimer);
+
 	programCounter += 2;
 }
 
@@ -853,10 +855,12 @@ void Chocolate::_FX0A(unsigned short opcode){
 *
 */
 void Chocolate::_FX15(unsigned short opcode){
-	logstmt += fmt::format("(FX0A : {:X}) ",opcode & 0xFFFF);
+	logstmt += fmt::format("(FX15 : {:X}) ",opcode & 0xFFFF);
 
 	unsigned char reg = (opcode & 0x0F00) >> 8;
 	unsigned char val = V[reg];
+
+	logstmt += fmt::format("Delay Timer = V[{:X}] = {:X}",reg,val);
 
 	delayTimer = val;
 

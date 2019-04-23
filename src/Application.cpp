@@ -5,6 +5,7 @@
 #include "Chocolate.hpp"
 
 int convertKeycode(sf::Keyboard::Key);
+int charKeycode(char key);
 
 int main()
 {
@@ -92,6 +93,7 @@ int main()
 
 		// Let the CHIP-8 process events and render graphics to its buffer
 		
+		
 		if(manual){
 			getchar();
 		}
@@ -100,10 +102,12 @@ int main()
 
 		if(debug){
 			printf("\033c");
+			
 			for(int i = 0; i < 16; i++){
 				std::cout << chip8.keyStates[i];
 			}
-
+			std::cout << std::endl;
+			std::cout << fmt::format("Delay Timer: {:X}  Sound Timer: {:X}",chip8.delayTimer,chip8.soundTimer) << std::endl;
 			std::cout << fmt::format("0    1    2    3    4    5    6    7    8    9    A    B    C    D    E    F") << std::endl;
 			for(int i = 0; i < 0x10; i++){
 				std::cout << fmt::format("[{:02X}] ",chip8.V[i]);
@@ -117,14 +121,15 @@ int main()
 				std::cout << log[i] << std::endl;
 			}
 
-			std::cout << chip8.stackPointer << std::endl;
+			std::cout << "Stack Pointer: " << chip8.stackPointer << std::endl;
 
+			std::cout << "Stack:" << std::endl;
 			for(int i = 0; i < chip8.stackPointer; i++){
-				std::cout << chip8.stack[i] << std::endl;
+				std::cout << fmt::format("{:X}",chip8.stack[i]) << std::endl;
 			}
 
 		}
-		if(chip8.drawFlag){
+		//if(chip8.drawFlag){
 			// Set the screen back to black (we do this every frame before redrawing everything)
 			window.clear(sf::Color::Black);
 
@@ -140,7 +145,7 @@ int main()
 				}
 			}
 			chip8.drawFlag = false;
-		}
+		//}
 
 		/*
 		for (int x = 0; x < 64; x++) {
@@ -192,6 +197,38 @@ int convertKeycode(sf::Keyboard::Key key)
 	case sf::Keyboard::X: return 0x0;
 	case sf::Keyboard::C: return 0xB;
 	case sf::Keyboard::V: return 0xF;
+
+	default: return -1;
+	}
+}
+int charKeycode(char key)
+{
+
+
+	switch (key) {
+	// Row 0
+	case '1': return 0x1;
+	case '2': return 0x2;
+	case '3': return 0x3;
+	case '4': return 0xC;
+
+	// Row 1
+	case 'q': return 0x4;
+	case 'w': return 0x5;
+	case 'e': return 0x6;
+	case 'r': return 0xD;
+
+	// Row 2
+	case 'a': return 0x7;
+	case 's': return 0x8;
+	case 'd': return 0x9;
+	case 'f': return 0xE;
+
+	// Row 3
+	case 'z': return 0xA;
+	case 'x': return 0x0;
+	case 'c': return 0xB;
+	case 'v': return 0xF;
 
 	default: return -1;
 	}

@@ -24,6 +24,8 @@ class Chocolate
 		bool drawFlag;
 		bool keyStates[16]; // true for pressed, false for unpressed
 
+		unsigned short delayTimer;
+		unsigned short soundTimer;
 
 		//Opcodes
 		void _00E0();
@@ -68,8 +70,7 @@ class Chocolate
 		unsigned short I;
 		unsigned short programCounter;
 
-		unsigned short delayTimer;
-		unsigned short soundTimer;
+
 
 		// true following a tick where the sound timer expires
 		bool buzzer;
