@@ -519,9 +519,11 @@ void Chocolate::_8XY3(unsigned short opcode){
 	unsigned char yVal = V[yIndex];
 	unsigned char xVal = V[xIndex];
 
-	unsigned char xorVal = xVal^yVal;
 
+	unsigned char xorVal = xVal^yVal;
 	V[xIndex] = xorVal;
+
+	logstmt += fmt::format("V[{:X}] = V[{:X}] ({:X}) ^ V[{:X}] ({:X}) = {:X}",xIndex,xIndex,xVal,yIndex,yVal,xorVal);
 
 	programCounter += 2;
 
@@ -544,6 +546,7 @@ void Chocolate::_8XY4(unsigned short opcode){
 	unsigned char xVal = V[xIndex];
 
 	V[xIndex] = yVal + xVal;
+	logstmt += fmt::format("V[{:X}] = V[{:X}] ({:X}) + V[{:X}] ({:X})",xIndex,xIndex,xVal,yIndex,yVal);
 
 	if(xVal + yVal > 0xFF){
 		V[0xF] = 1;
@@ -572,6 +575,8 @@ void Chocolate::_8XY5(unsigned short opcode){
 	unsigned char xVal = V[xIndex];
 
 	V[xIndex] = xVal - yVal;
+
+	logstmt += fmt::format("V[{:X}] += V[{:X}] ({:X})",xIndex,yIndex,yVal);
 
 	if(xVal - yVal < 0xFF){
 		V[0xF] = 1;
@@ -899,12 +904,17 @@ void Chocolate::_FX1E(unsigned short opcode){
 
 	if((val + I) > 0xFFF){
 		V[0xF] = 1;
+		logstmt += fmt::format("val > 0xFFF: V[0xF] = 1");
 	}
 	else{
 		V[0xF] = 0;
 	}
 
+	unsigned short oldI = I;
+	
 	I += val;
+
+	logstmt += fmt::format("I = I {:X} + {:X} = {:X}",oldI,val,I);
 
 	programCounter += 2;
 
@@ -935,6 +945,7 @@ void Chocolate::_FX29(unsigned short opcode){
 *
 */
 void Chocolate::_FX33(unsigned short opcode){
+	logstmt += fmt::format("(FX33 : {:X}) ",opcode & 0xFFFF);
 	unsigned char reg = (opcode & 0x0F00) >> 8;
 	unsigned char val = V[reg];
 	
@@ -952,13 +963,16 @@ void Chocolate::_FX33(unsigned short opcode){
 *
 */
 void Chocolate::_FX55(unsigned short opcode){
-	logstmt += fmt::format("(FX1E : {:X}) ",opcode & 0xFFFF);
+	logstmt += fmt::format("(FX55 : {:X}) ",opcode & 0xFFFF);
 
 	unsigned char limit = (opcode & 0x0F00) >> 8;
 
+	logstmt += fmt::format("Offsetting registers by {:X}",limit);
 	for(int i = 0; i <= limit; i++){
 		memory[I + i] = V[i];
 	}
+
+
 
 	I += limit + 1;
 
@@ -977,6 +991,7 @@ void Chocolate::_FX65(unsigned short opcode){
 
 	unsigned char limit = (opcode & 0x0F00) >> 8;
 
+	logstmt += fmt::format("Filling registers from {:X}",limit);
 	for(int i = 0; i <= limit; i++){
 		V[i] = memory[I + i];
 	}

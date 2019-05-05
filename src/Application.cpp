@@ -17,7 +17,7 @@ int main()
 	char inManual = 'y';
 	bool debug = true;
 	bool manual = true;
-
+	int framerate = 0;
 	
 	printf("Enter ROM file path: ");
 	scanf("%s",rom);
@@ -34,6 +34,10 @@ int main()
 		debug = false;
 	}
 	
+	if(!manual){
+		printf("Enter framerate: ");
+		scanf(" %d",&framerate);
+	}
 
 
 	sf::SoundBuffer buffer;
@@ -49,7 +53,7 @@ int main()
 
 	// Non-resizable window with a titlebar and a "close" button
 	sf::RenderWindow window(sf::VideoMode(480, 240), "CHIP-8 Display", sf::Style::Titlebar | sf::Style::Close);
-	window.setFramerateLimit(60); // Force application to run near 60 FPS (CHIP-8 runs at 60Hz)
+	window.setFramerateLimit(framerate); // Force application to run near 60 FPS (CHIP-8 runs at 60Hz)
 
 	// A 64x32 pixel "view," used to specify the part of window's internal pixel array that we actually want to display
 	sf::View view(sf::FloatRect(0, 0, 64, 32));

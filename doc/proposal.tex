@@ -49,9 +49,9 @@ in addition to properly running a long lost architecture.
 \section{Introduction}
 ChocolateChip is written in C++ and primarily focused on giving the user the entire picture of what is happening inside
 the machine opposed to just simply emulating it. The CHIP-8 architecture is much simpler to emulate than many other architectures due
-to it's small amount of opcodes and easy to understand. Chocolate Chip has a status screen that displays the last few opcodes 
-executed with a line reading out what they do and their effect on the system, the status of the registers, the position in memory being pointed to, and the status of the stack.
-This is all throughly documented and tested in code as well created a stable and informative emulator
+to it's small amount of opcodes and being contained in one process. Chocolate Chip has a status screen that displays the last few opcodes 
+executed with a line reading out what they do and their effect on the system, the status of the registers, the position in memory being pointed to, the keys being pressed, and the status of the stack.
+This is all throughly documented as well.
 
 \section{Installation}
 
@@ -72,12 +72,7 @@ This is all throughly documented and tested in code as well created a stable and
     \item Run \colorbox{gray!30}{make}
 \end{itemize}
 
-\section{References}
-\begin{itemize}
-    \item Cowgod's Chip 8 Reference\\ \href{http://devernay.free.fr/hacks/chip8/C8TECH10.HTM}{http://devernay.free.fr/hacks/chip8/C8TECH10.HTM}
-    \item Multigesture How to build an emulator\\ \href{http://www.multigesture.net/articles/how-to-write-an-emulator-chip-8-interpreter/}{http://www.multigesture.net/articles/how-to-write-an-emulator-chip-8-interpreter/}
-    \item Wikipedia's CHIP-8 Page\\ \href{https://en.wikipedia.org/wiki/CHIP-8}{https://en.wikipedia.org/wiki/CHIP-8}
-\end{itemize}
+
 
 \section{Methodology}
 Chocolate Chip is divided into 3 classes, the Emulator, the Application and the Logger.
@@ -104,11 +99,16 @@ This was a feature I wanted to focus on this project so anyone can see what the 
 
 
 \section{Results}
-As of right now, April 14, 2019, I have 24 opcodes implemented, including graphics. This is enough to run some basic programs, but the project won't be
-considered complete until they all are. The logger is functional, but isn't well organized or show anything about the stack. This is planned to be included.
-Many of the functions do not have any kind of logging and more are undocumented. There are also currently no unit tests written.
-These are all features that are planned to be implemented soon.
+As of the final for CS333 all of the opcodes are implemented. Graphics word correctly and many basic ROMs run perfectly.
+Options are given to the user to run the emulator in different modes and speeds. The logger is fully functional. However, no unit tests have been written due to a good way of testing them
+Many more advanced games are buggy and unplayable, however simpler ROMs that do not rely on graphic collision calculation work flawlessly.
 
+\section{References}
+\begin{itemize}
+    \item Cowgod's Chip 8 Reference\\ \href{http://devernay.free.fr/hacks/chip8/C8TECH10.HTM}{http://devernay.free.fr/hacks/chip8/C8TECH10.HTM}
+    \item Multigesture How to build an emulator\\ \href{http://www.multigesture.net/articles/how-to-write-an-emulator-chip-8-interpreter/}{http://www.multigesture.net/articles/how-to-write-an-emulator-chip-8-interpreter/}
+    \item Wikipedia's CHIP-8 Page\\ \href{https://en.wikipedia.org/wiki/CHIP-8}{https://en.wikipedia.org/wiki/CHIP-8}
+\end{itemize}
 
 
 \end{document}
