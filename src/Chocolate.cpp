@@ -214,8 +214,17 @@ void Chocolate::tick()
 				case 0x0015:{
 					_FX15(opcode);
 				}break;
+				case 0x0018:{
+					_FX18(opcode);
+				}break;
+				case 0x0029:{
+					_FX29(opcode);
+				}break;
 				case 0x001E:{
 					_FX1E(opcode);
+				}break;
+				case 0x0033:{
+					_FX33(opcode);
 				}break;
 				case 0x0055:{
 					_FX55(opcode);
@@ -930,7 +939,7 @@ void Chocolate::_FX29(unsigned short opcode){
 	logstmt += fmt::format("(FX29 : {:X}) ",opcode & 0xFFFF);
 
 	unsigned char reg = (opcode & 0x0F00) >> 8;
-	unsigned char val = V[reg];
+	unsigned short val = V[reg] * 0x5;
 
 	I = val;
 
