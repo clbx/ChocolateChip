@@ -1,11 +1,16 @@
 # ChocolateChip
-🍪 My foray into emulator design
+🍪 My foray into emulator design and also due to a rewrite
 
 Some very useful resources:
 
 [Chip 8's Wikipedia Page](https://en.wikipedia.org/wiki/CHIP-8)
 
 [Cowgod's Chip 8 Technical Reference](http://devernay.free.fr/hacks/chip8/C8TECH10.HTM)
+
+# Why is this due for a re-write?
+Short answer: It's shit
+
+Long answer: This was my first time ever writing an emulator, and really anything with graphics in C++. Inefficencies that are allowed in most programs are not allowed here, and there needs to be a very close eye put on emulation speed and maintaing a faithful representation on what would run on original hardware. I also have grown really tried of SFML, I feel like it is technically inferior to SDL for something like this. The application part of this code is poorly written and has a lot of "hacks", the logger is slow and buggy. My method of writing each opcode as a function seems to be sound, but the way I create new variables for every operation has bitten me in the ass. While I think it does improve on readibility, it introduces a lot of bugs. I think the start of this was a great way for me to learn the basics, and I want to re-write this to be faster, more accurate, and loose a few bugs
 
 # Requirements:
 * [SFML](https://www.sfml-dev.org) : For graphics
