@@ -1,5 +1,5 @@
 # ChocolateChip
-🍪 An easy to follow CHIP-8 emulator for newcomers into processor design
+🍪 My foray into emulator design
 
 Some very useful resources:
 
