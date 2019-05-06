@@ -1,6 +1,8 @@
 # ChocolateChip
 🍪 My foray into emulator design and also due to a rewrite
 
+# Rewrite in-progress, check the rewrite branch
+
 Some very useful resources:
 
 [Chip 8's Wikipedia Page](https://en.wikipedia.org/wiki/CHIP-8)
