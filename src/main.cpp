@@ -3,101 +3,72 @@
 #include <iostream>
 #include <SDL2/SDL.h>
 
-#include "imgui.h"
-#include "imgui_sdl.h"
+#include "Chocolate.hpp"
+
+// GUI Stuff Soon, just reall increases on compile time
+//#include "imgui.h"
+//#include "imgui_sdl.h"
 
 using namespace std;
 
 
 const int SCREEN_WIDTH = 640;
-const int SCREEN_HEIGHT = 480;
+const int SCREEN_HEIGHT = 320;
 
 
-int main(){
+int main(int argc, char* argv[]){
     SDL_Init(SDL_INIT_VIDEO);
-    
-
     SDL_Window *win = SDL_CreateWindow("Chip 8 Emulator",100,100,SCREEN_WIDTH,SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
     SDL_Renderer *ren = SDL_CreateRenderer(win,-1,SDL_RENDERER_ACCELERATED|SDL_RENDERER_PRESENTVSYNC);
+    SDL_RenderSetLogicalSize(ren,SCREEN_WIDTH,SCREEN_HEIGHT);    
 
-    SDL_RenderSetLogicalSize(ren,640,480);
+    SDL_Texture *tex = SDL_CreateTexture(ren,SDL_PIXELFORMAT_ABGR8888,SDL_TEXTUREACCESS_STATIC,64,32);
 
-    ImGui::CreateContext();
-    ImGuiSDL::Initialize(ren,SCREEN_HEIGHT,SCREEN_WIDTH);
+    //temp gfx
+    uint8_t gfx[2048];
+    memset(gfx,0,2048*sizeof(uint8_t));
 
-    string imagePath = "./dude.bmp";
-    SDL_Surface *bmp = SDL_LoadBMP(imagePath.c_str());
-    if(bmp == nullptr){
-        printf("poop");
-    }
-    
-    
-    //SDL_Texture *tex = SDL_CreateTextureFromSurface(ren, bmp);
-    //SDL_FreeSurface(bmp);
-    
-
-   SDL_Texture *tex = SDL_CreateTexture(ren,SDL_PIXELFORMAT_ABGR8888,SDL_TEXTUREACCESS_STATIC,SCREEN_WIDTH,SCREEN_HEIGHT);
-
-    Uint32 *pixels = new Uint32[640*480];
-
-    memset(pixels,255,640*480*sizeof(Uint32));
+    //sdl pixels
+    uint32_t pixels[2048];
+    memset(pixels,0,2048*sizeof(uint32_t));
 
     bool loop = true;
-    bool mouseDown = false;
     SDL_Event event;
+    Chocolate chip = Chocolate();
+
+    chip.load("maze");
 
     while(loop){
+        //ImGuiIO& io = ImGui::GetIO();
+        getchar();
+        chip.tick();
 
-        ImGuiIO& io = ImGui::GetIO();
+        while(SDL_PollEvent(&event)){
 
-        SDL_UpdateTexture(tex,NULL,pixels,640*sizeof(Uint32));
-        SDL_WaitEvent(&event);
+            switch(event.type){
+                case SDL_QUIT:
+                    loop = false;
+                    break;
 
-        switch(event.type){
-            case SDL_QUIT:
-                loop = false;
-                break;
-            case SDL_MOUSEBUTTONUP:
-                if(event.button.button == SDL_BUTTON_LEFT){
-                    mouseDown = false;
-                }
-                break;
-            case SDL_MOUSEBUTTONDOWN:
-                if(event.button.button == SDL_BUTTON_LEFT){
-                    mouseDown = true;
-                }
-                break;
-            case SDL_MOUSEMOTION:
-                if(mouseDown){
-                    int mouseX = event.motion.x;
-                    int mouseY = event.motion.y;
-                    pixels[mouseY * 640 + mouseX] = 0;
-                }
-                break;
+            }
+
         }
 
+        for(int i = 0; i < 2048; i++){
+            uint8_t pixel = gfx[i];
+            pixels[i] = (0x00FFFFFF * pixel) | 0xFF000000;
+        }
+
+
+        SDL_UpdateTexture(tex,NULL,pixels,64*sizeof(uint32_t));      
         SDL_RenderClear(ren);
         SDL_RenderCopy(ren,tex,NULL,NULL);
         SDL_RenderPresent(ren);
 
     }
 
-
-
-
-
-
-    
-
-
-
     SDL_DestroyTexture(tex);
     SDL_DestroyRenderer(ren);
     SDL_DestroyWindow(win);
     SDL_Quit();
-}
-
-
-void logSDLError(std::ostream &os, const std::string &msg){
-    os << msg << " ERROR: " << SDL_GetError() << std::endl;
 }
