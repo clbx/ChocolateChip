@@ -1,6 +1,10 @@
+
 #include <string>
 #include <iostream>
 #include <SDL2/SDL.h>
+
+#include "imgui.h"
+#include "imgui_sdl.h"
 
 using namespace std;
 
@@ -15,7 +19,11 @@ int main(){
 
     SDL_Window *win = SDL_CreateWindow("Chip 8 Emulator",100,100,SCREEN_WIDTH,SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
     SDL_Renderer *ren = SDL_CreateRenderer(win,-1,SDL_RENDERER_ACCELERATED|SDL_RENDERER_PRESENTVSYNC);
+
     SDL_RenderSetLogicalSize(ren,640,480);
+
+    ImGui::CreateContext();
+    ImGuiSDL::Initialize(ren,SCREEN_HEIGHT,SCREEN_WIDTH);
 
     string imagePath = "./dude.bmp";
     SDL_Surface *bmp = SDL_LoadBMP(imagePath.c_str());
@@ -23,10 +31,10 @@ int main(){
         printf("poop");
     }
     
-    /*
-    SDL_Texture *tex = SDL_CreateTextureFromSurface(ren, bmp);
-    SDL_FreeSurface(bmp);
-    */
+    
+    //SDL_Texture *tex = SDL_CreateTextureFromSurface(ren, bmp);
+    //SDL_FreeSurface(bmp);
+    
 
    SDL_Texture *tex = SDL_CreateTexture(ren,SDL_PIXELFORMAT_ABGR8888,SDL_TEXTUREACCESS_STATIC,SCREEN_WIDTH,SCREEN_HEIGHT);
 
@@ -39,8 +47,10 @@ int main(){
     SDL_Event event;
 
     while(loop){
-        SDL_UpdateTexture(tex,NULL,pixels,640*sizeof(Uint32));
 
+        ImGuiIO& io = ImGui::GetIO();
+
+        SDL_UpdateTexture(tex,NULL,pixels,640*sizeof(Uint32));
         SDL_WaitEvent(&event);
 
         switch(event.type){
@@ -71,6 +81,8 @@ int main(){
         SDL_RenderPresent(ren);
 
     }
+
+
 
 
 
