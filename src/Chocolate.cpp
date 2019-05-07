@@ -31,7 +31,6 @@ void Chocolate::reset(){
     for(int i = 0; i < 80; i++){
         memory[i] = fontset[i];
     }
-
 }
 
 /**
@@ -74,54 +73,189 @@ void Chocolate::tick(){
     switch(op & 0xF000){
         case 0x0000:{
             switch(op & 0x000F){
-                case 0x0000:{}break;
-                case 0x000E:{}break;
+                case 0x0000:{_0NNN();}break;
+                case 0x000E:{_00E0();}break;
             }
         }break;
-        case 0x1000:{}break;
-        case 0x2000:{}break;
-        case 0x3000:{}break;
-        case 0x4000:{}break;
-        case 0x5000:{}break;
-        case 0x6000:{}break;
-        case 0x7000:{}break;
+        case 0x1000:{_1NNN();}break;
+        case 0x2000:{_2NNN();}break;
+        case 0x3000:{_3XNN();}break;
+        case 0x4000:{_4XNN();}break;
+        case 0x5000:{_5XY0();}break;
+        case 0x6000:{_6XNN();}break;
+        case 0x7000:{_7XNN();}break;
         case 0x8000:{
             switch(op & 0x000F){
-                case 0x0000:{}break;
-                case 0x0001:{}break;
-                case 0x0002:{}break;
-                case 0x0003:{}break;
-                case 0x0004:{}break;
-                case 0x0005:{}break;
-                case 0x0006:{}break;
-                case 0x0007:{}break;
-                case 0x000E:{}break;
+                case 0x0000:{_8XY0();}break;
+                case 0x0001:{_8XY1();}break;
+                case 0x0002:{_8XY2();}break;
+                case 0x0003:{_8XY3();}break;
+                case 0x0004:{_8XY4();}break;
+                case 0x0005:{_8XY5();}break;
+                case 0x0006:{_8XY6();}break;
+                case 0x0007:{_8XY7();}break;
+                case 0x000E:{_8XYE();}break;
             }
         }break;
-        case 0x9000:{}break;
-        case 0xA000:{}break;
-        case 0xB000:{}break;
-        case 0xC000:{}break;
-        case 0xD000:{}break;
-        case 0xE000:{}break;
+        case 0x9000:{_9XY0();}break;
+        case 0xA000:{_ANNN();}break;
+        case 0xB000:{_BNNN();}break;
+        case 0xC000:{_CXNN();}break;
+        case 0xD000:{_DXYN();}break;
+        case 0xE000:{
+            switch(op & 0x000F){
+                case 0x000E:{_EX9E();}break;
+                case 0x0001:{_EXA1();}break;
+            }
+        }break;
         case 0xF000:{
             switch(op & 0x0FF){
-                case 0x0007:{}break;
-                case 0x000A:{}break;
-                case 0x0015:{}break;
-                case 0x0018:{}break;
-                case 0x0029:{}break;
-                case 0x001E:{}break;
-                case 0x0033:{}break;
-                case 0x0055:{}break;
-                case 0x0065:{}break;
+                case 0x0007:{_FX07();}break;
+                case 0x000A:{_FX0A();}break;
+                case 0x0015:{_FX15();}break;
+                case 0x0018:{_FX18();}break;
+                case 0x0029:{_FX29();}break;
+                case 0x001E:{_FX1E();}break;
+                case 0x0033:{_FX33();}break;
+                case 0x0055:{_FX55();}break;
+                case 0x0065:{_FX65();}break;
             }
         }break;
         default:{printf("unknown opcode");}
     }
 
-    pc += 2;
+}
 
+
+/**
+ * @brief Clears the screen
+ * 
+ */
+void Chocolate::_0NNN(){
+    memset(graphics,0,2048);
+}
+
+/**
+ * @brief 
+ * 
+ */
+void Chocolate::_00E0(){
+    
+}
+
+/**
+ * @brief 
+ * 
+ */
+void Chocolate::_00EE(){
+
+}
+void Chocolate::_1NNN(){
+
+}
+void Chocolate::_2NNN(){
+
+}
+void Chocolate::_3XNN(){
+
+}
+void Chocolate::_4XNN(){
+
+}
+void Chocolate::_5XY0(){
+
+}
+void Chocolate::_6XNN(){
+
+}
+void Chocolate::_7XNN(){
+
+}
+void Chocolate::_8XY0(){
+
+}
+void Chocolate::_8XY1(){
+
+}
+void Chocolate::_8XY2(){
+
+}
+void Chocolate::_8XY3(){
+
+}
+void Chocolate::_8XY4(){
+
+}
+void Chocolate::_8XY5(){
+
+}
+void Chocolate::_8XY6(){
+
+}
+void Chocolate::_8XY7(){
+
+}
+void Chocolate::_8XYE(){
+
+}
+void Chocolate::_9XY0(){
+
+}
+void Chocolate::_ANNN(){
+
+}
+void Chocolate::_BNNN(){
+
+}
+void Chocolate::_CXNN(){
+
+}
+void Chocolate::_DXYN(){
+
+}
+void Chocolate::_EX9E(){
+
+}
+void Chocolate::_EXA1(){
+
+}
+void Chocolate::_FX07(){
+
+}
+void Chocolate::_FX0A(){
+
+}
+void Chocolate::_FX15(){
+
+}
+void Chocolate::_FX18(){
+
+}
+void Chocolate::_FX1E(){
+
+}
+void Chocolate::_FX29(){
+
+}
+void Chocolate::_FX33(){
+
+}
+void Chocolate::_FX55(){
+
+}
+void Chocolate::_FX65(){
 
 }
 
+
+/**
+ * @brief Pushes to the stack
+ * 
+ */
+void Chocolate::push(uint16_t val){
+
+}
+
+uint16_t Chocolate::pop(){
+
+}
