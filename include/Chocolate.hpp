@@ -15,6 +15,7 @@ class Chocolate{
         uint8_t sound;
 
         uint16_t pc;
+        uint16_t pcDelta;
         uint16_t op;
 
         uint16_t NNN;
@@ -22,6 +23,7 @@ class Chocolate{
         uint8_t N;
         uint8_t X;
         uint8_t Y;
+
 
         uint8_t fontset[80] =
         {
@@ -43,7 +45,6 @@ class Chocolate{
             0xF0, 0x80, 0xF0, 0x80, 0x80  //F
         };
 
-        void _0NNN();
         void _00E0();
         void _00EE();
         void _1NNN();

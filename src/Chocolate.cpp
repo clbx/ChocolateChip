@@ -68,13 +68,16 @@ void Chocolate::tick(){
     X = (op & 0x0F00) >> 8;
     Y = (op & 0x00F0) >> 4;
 
+    //Reset Program Counter Delta
+    pcDelta = 1;
+
     printf("%04X\n",op);
 
     switch(op & 0xF000){
         case 0x0000:{
             switch(op & 0x000F){
-                case 0x0000:{_0NNN();}break;
-                case 0x000E:{_00E0();}break;
+                case 0x0000:{_00E0();}break;
+                case 0x000E:{_00EE();}break;
             }
         }break;
         case 0x1000:{_1NNN();}break;
@@ -124,6 +127,7 @@ void Chocolate::tick(){
         default:{printf("unknown opcode");}
     }
 
+    pc += 2 * pcDelta;
 }
 
 
@@ -131,39 +135,50 @@ void Chocolate::tick(){
  * @brief Clears the screen
  * 
  */
-void Chocolate::_0NNN(){
-    memset(graphics,0,2048);
-}
-
-/**
- * @brief 
- * 
- */
 void Chocolate::_00E0(){
-    
+    memset(graphics,0,2048);            //Set graphics memory to 0
+    draw = true;                        //Tell SDL to render new screen
 }
 
 /**
- * @brief 
+ * @brief Return from a subroutine
  * 
  */
 void Chocolate::_00EE(){
-
+    pc = pop();                         //Pop from stack to get return location
+    pcDelta = 2;                        //Go to instruction after
 }
+
+/**
+ * @brief Jumps to NNN
+ * 
+ */
 void Chocolate::_1NNN(){
-
+    pc = NNN;
 }
+
+/**
+ * @brief Calls subroutine at NNN
+ * 
+ */
 void Chocolate::_2NNN(){
-
+    push(pc);
+    pc = NNN;
 }
+
+/**
+ * @brief Skips the next instruction if V[X] = NN
+ * 
+ */
 void Chocolate::_3XNN(){
-
+    (V[X] == NN) ? pcDelta = 2:pcDelta=1;
 }
-void Chocolate::_4XNN(){
 
+void Chocolate::_4XNN(){
+    (V[X] != NN) ? pcDelta = 2:pcDelta=1;
 }
 void Chocolate::_5XY0(){
-
+    
 }
 void Chocolate::_6XNN(){
 
@@ -249,13 +264,19 @@ void Chocolate::_FX65(){
 
 
 /**
- * @brief Pushes to the stack
+ * @brief pushes a value onto the stack
  * 
+ * @param val 
  */
 void Chocolate::push(uint16_t val){
-
+    stack[sp++] = val;
 }
 
+/**
+ * @brief pops the value on the top of the stack
+ * 
+ * @return uint16_t 
+ */
 uint16_t Chocolate::pop(){
-
+    return stack[sp--];
 }
