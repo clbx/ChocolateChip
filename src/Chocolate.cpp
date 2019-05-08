@@ -170,6 +170,7 @@ void Chocolate::_00EE(){
  */
 void Chocolate::_1NNN(){
     pc = NNN;
+    pcDelta = 0;
 }
 
 /**
