@@ -71,8 +71,6 @@ void Chocolate::tick(){
     //Reset Program Counter Delta
     pcDelta = 1;
 
-    printf("%04X\n",op);
-
     switch(op & 0xF000){
         case 0x0000:{
             switch(op & 0x000F){
@@ -127,6 +125,23 @@ void Chocolate::tick(){
         default:{printf("unknown opcode");}
     }
 
+    if(delay > 0)
+        delay--;
+    if(sound > 0)
+        sound--;
+
+
+    printf("%04X ",op);
+
+    printf("NNN:%03X NN:%02X N:%1X X:%1X Y:%1X   I:%d (%03X)\n",NNN,NN,N,X,Y,I,I);
+
+    for(int i = 0; i < 16; i++){
+        printf("%d:%d ",i,V[i]);
+    }
+    printf("\n");
+
+    
+
     pc += 2 * pcDelta;
 }
 
@@ -170,9 +185,16 @@ void Chocolate::_2NNN(){
  * @brief Skips the next instruction if V[X] = NN
  * 
  */
+
+/*
+void Chocolate::_3XNN(){
+    pcDelta = (V[X] == NN) ? 2:1;
+}*/
+
 void Chocolate::_3XNN(){
     pcDelta = (V[X] == NN) ? 2:1;
 }
+
 
 /**
  * @brief Skips the next instructio if V[X] != NN
@@ -313,7 +335,8 @@ void Chocolate::_BNNN(){
  * 
  */
 void Chocolate::_CXNN(){
-    V[X] = (rand() % (0xFF +1)) & NN;
+    V[X] = 1;
+    //V[X] = (rand() % (0xFF +1)) & NN;
 }
 
 /**

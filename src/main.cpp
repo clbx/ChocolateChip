@@ -33,7 +33,9 @@ int main(int argc, char* argv[]){
     chip.load("maze");
 
     while(loop){
+
         getchar();
+
         chip.tick();
 
         while(SDL_PollEvent(&event)){
