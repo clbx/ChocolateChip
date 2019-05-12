@@ -336,8 +336,7 @@ void Chocolate::_BNNN(){
  * 
  */
 void Chocolate::_CXNN(){
-    V[X] = 1;
-    //V[X] = (rand() % (0xFF +1)) & NN;
+    V[X] = (rand() % (0xFF +1)) & NN;
 }
 
 /**
@@ -352,20 +351,23 @@ void Chocolate::_DXYN(){
     
     V[0xF] = 0;
 
-    for(int i = 0; i < N; i++){
-        pixel = memory[I+i];
-        for(int j = 0; j < 8; j++){
-            if((pixel & (0x80 >> j)) != 0){
-                if(graphics[(X + j + ((Y+ i) * 64)) ] == 1){
+    uint8_t x = V[X];
+    uint8_t y = V[Y];
+
+    for (int yline = 0; yline < N; yline++){
+        pixel = memory[I + yline];
+        for(int xline = 0; xline < 8; xline++){
+            if((pixel & (0x80 >> xline)) != 0){
+                if(graphics[(x + xline + ((y + yline) * 64))] == 1){
                     V[0xF] = 1;
                 }
-                graphics[X + j + ((Y+i) * 64)] ^= 1;
+                graphics[x + xline + ((y + yline) * 64)] ^= 1;
             }
         }
     }
+
     draw = true;
 }
-
 
 /**
  * @brief Skips the next instruction if the key stored in V[X] is pressed

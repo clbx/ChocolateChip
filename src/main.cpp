@@ -16,6 +16,11 @@ SDL_Renderer* ren;
 SDL_Texture* tex;
 
 int main(int argc, char* argv[]){
+
+
+
+
+
     SDL_Init(SDL_INIT_VIDEO);
     win = SDL_CreateWindow("Chip 8 Emulator",100,100,SCREEN_WIDTH,SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
     ren = SDL_CreateRenderer(win,-1,SDL_RENDERER_ACCELERATED|SDL_RENDERER_PRESENTVSYNC);
@@ -30,11 +35,12 @@ int main(int argc, char* argv[]){
     SDL_Event event;
     Chocolate chip = Chocolate();
 
-    chip.load("maze");
+
+
+    chip.load(argv[1]);
 
     while(loop){
 
-        getchar();
 
         chip.tick();
 
