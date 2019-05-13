@@ -163,7 +163,7 @@ void Chocolate::_00E0(){
  * 
  */
 void Chocolate::_00EE(){
-    pc = pop();             
+    pc = stack[--sp];        
     pcDelta = 2;               
 }
 
@@ -181,7 +181,7 @@ void Chocolate::_1NNN(){
  * 
  */
 void Chocolate::_2NNN(){
-    push(pc);
+    stack[sp++] = pc;
     pc = NNN;
 }
 
@@ -474,23 +474,4 @@ void Chocolate::_FX65(){
     for(int i = 0; i <= V[X]; i++){
         V[i] = memory[I+i];
     }
-}
-
-
-/**
- * @brief pushes a value onto the stack
- * 
- * @param val 
- */
-void Chocolate::push(uint16_t val){
-    stack[sp++] = val;
-}
-
-/**
- * @brief pops the value on the top of the stack
- * 
- * @return uint16_t 
- */
-uint16_t Chocolate::pop(){
-    return stack[sp--];
 }
