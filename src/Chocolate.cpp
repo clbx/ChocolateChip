@@ -45,6 +45,9 @@ bool Chocolate::load(const char* filename){
     reset();
 
     FILE* file = fopen(filename, "r");
+    if(file == nullptr){
+        return false;
+    }
     fread(memory + 0x200,1,sizeof(memory) - 0x200, file);
     fclose(file);
 
