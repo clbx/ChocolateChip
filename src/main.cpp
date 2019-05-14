@@ -40,15 +40,17 @@ bool manual = false;
 
 int main(int argc, char** argv){
 
+
     if(argc == 1){
         cout << "chocolate: try \"chocolate -h\" for more information" << endl;
         return(1);
     }
 
+    filename = argv[2];
+
     bool cont = handleArgs(argc,argv);
 
     
-
     if(!cont){
         return(0);
     }
@@ -67,14 +69,17 @@ int main(int argc, char** argv){
     SDL_Event event;
     Chocolate chip = Chocolate();
 
+    chip.load(filename);
 
     while(loop){
 
-        printf("\033c");
+        
         
         if(manual){
             getchar();
         }
+
+        printf("\033c");
 
         chip.tick();
 
@@ -133,12 +138,14 @@ int main(int argc, char** argv){
 
 bool handleArgs(int argc, char** argv){
     //Get flags
-    for(int i = 0; i < argc-1;){
+    for(int i = 1; i < argc-1;){
+        printf("%s\n",argv[i]);
         switch(argv[i][1]){
-            case 'h':{help();return false;}break;
+            case 'h':{help();return false;i++;}break;
             case 's':{emulationSpeed = atoi(argv[i+1]);i+=2;}break;
-            case 'd':{debug = true;}break;
-            case 'm':{manual = true;}break;
+            case 'd':{debug = true;i++;}break;
+            case 'm':{manual = true;i++;}break;
+            default:{}break;
         }
     }
     filename = argv[argc-1];

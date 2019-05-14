@@ -134,15 +134,21 @@ void Chocolate::tick(){
         sound--;
 
 
-    printf("%04X ",op);
+    printf("%04X : %04X \n",pc,op);
 
     printf("NNN:%03X NN:%02X N:%1X X:%1X Y:%1X   I:%d (%03X)\n",NNN,NN,N,X,Y,I,I);
 
     for(int i = 0; i < 16; i++){
-        printf("%d:%d ",i,V[i]);
+        printf("%X:%02X ",i,V[i]);
     }
     printf("\n");
 
+    /*
+    for(int i = 0x200; i < 800; i++){
+        printf("%04X",memory[i]);
+    }
+    printf("\n");
+    */
     
 
     pc += 2 * pcDelta;
@@ -163,8 +169,9 @@ void Chocolate::_00E0(){
  * 
  */
 void Chocolate::_00EE(){
-    pc = stack[--sp];        
-    pcDelta = 2;               
+    sp--;
+    pc = stack[sp];        
+    pcDelta = 1;               
 }
 
 /**
@@ -181,20 +188,16 @@ void Chocolate::_1NNN(){
  * 
  */
 void Chocolate::_2NNN(){
-    stack[sp++] = pc;
+    stack[sp] = pc;
+    sp++;
     pc = NNN;
+    pcDelta = 0;
 }
 
 /**
  * @brief Skips the next instruction if V[X] = NN
  * 
  */
-
-/*
-void Chocolate::_3XNN(){
-    pcDelta = (V[X] == NN) ? 2:1;
-}*/
-
 void Chocolate::_3XNN(){
     pcDelta = (V[X] == NN) ? 2:1;
 }
@@ -272,6 +275,7 @@ void Chocolate::_8XY3(){
 void Chocolate::_8XY4(){
     V[0xF] = ((V[X] + V[Y]) > 0xFFFF) ? 1:0;
     V[X] += V[Y];
+
 }
 
 /**
@@ -279,7 +283,7 @@ void Chocolate::_8XY4(){
  * 
  */
 void Chocolate::_8XY5(){
-    (V[Y] > V[X]) ? V[0xF]=0:V[0xF]=1;
+    V[0xF]= (V[X] - V[Y] < 0xFF) ? 1:0;
     V[X] -= V[Y];
 }
 
@@ -297,7 +301,7 @@ void Chocolate::_8XY6(){
  * 
  */
 void Chocolate::_8XY7(){
-    (V[Y] < V[X]) ? V[0xF]=0:V[0xF]=1;
+    V[0xF]= (V[Y] < V[X]) ? 0:1;
     V[X] = V[Y] - V[X];
 }
 
@@ -306,7 +310,7 @@ void Chocolate::_8XY7(){
  * 
  */
 void Chocolate::_8XYE(){
-    V[0xF] = V[X] & 0x80; //Get most signifigant bit
+    V[0xF] = V[X] >> 7; //Get most signifigant bit
     V[X] <<= 1;
 }
 
@@ -315,7 +319,7 @@ void Chocolate::_8XYE(){
  * 
  */
 void Chocolate::_9XY0(){
-    (V[X] != V[Y]) ? pcDelta =2:pcDelta=1;
+    pcDelta = (V[X] != V[Y]) ? 2:1;
 }
 
 /**
@@ -339,7 +343,7 @@ void Chocolate::_BNNN(){
  * 
  */
 void Chocolate::_CXNN(){
-    V[X] = (rand() % (0xFF +1)) & NN;
+    V[X] = ((rand() % (0xFF +1)) & NN);
 }
 
 /**
@@ -431,10 +435,11 @@ void Chocolate::_FX18(){
 }
 
 /**
- * @brief Adds V[X] to I
+ * @brief Adds V[X] to I. Set V[F] if there is a overflow
  * 
  */
 void Chocolate::_FX1E(){
+    V[0xF] = ((I + V[X]) > 0xFFF) ? 1:0; 
     I += V[X];
 }
 
@@ -463,6 +468,8 @@ void Chocolate::_FX55(){
     for(int i = 0; i <= V[X]; i++){
         memory[I + i] = V[i];
     }
+
+    I += X + 1;
 }
 
 /**
@@ -470,8 +477,10 @@ void Chocolate::_FX55(){
  * is increased by 1 for each value written, but I itself is left unmodified 
  * 
  */
+
+
 void Chocolate::_FX65(){
-    for(int i = 0; i <= V[X]; i++){
+    for(int i = 0; i <= X; i++){
         V[i] = memory[I+i];
     }
 }
