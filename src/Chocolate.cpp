@@ -170,8 +170,7 @@ void Chocolate::_00E0(){
  */
 void Chocolate::_00EE(){
     sp--;
-    pc = stack[sp];        
-    pcDelta = 1;               
+    pc = stack[sp];              
 }
 
 /**
@@ -249,7 +248,7 @@ void Chocolate::_8XY0(){
  * 
  */
 void Chocolate::_8XY1(){
-    V[X] = V[X] | V[Y];
+    V[X] |= V[Y];
 }
 
 /**
@@ -257,7 +256,7 @@ void Chocolate::_8XY1(){
  * 
  */
 void Chocolate::_8XY2(){
-    V[X] = V[X] & V[Y];    
+    V[X] &= V[Y];    
 }
 
 /**
@@ -265,7 +264,7 @@ void Chocolate::_8XY2(){
  * 
  */
 void Chocolate::_8XY3(){
-    V[X] = V[X] ^ V[Y];
+    V[X] ^= V[Y];
 }
 
 /**
@@ -273,8 +272,9 @@ void Chocolate::_8XY3(){
  * 
  */
 void Chocolate::_8XY4(){
-    V[0xF] = ((V[X] + V[Y]) > 0xFFFF) ? 1:0;
+    
     V[X] += V[Y];
+    V[0xF] = (V[Y] > (0xFF - V[X])) ? 1:0;
 
 }
 
@@ -283,8 +283,8 @@ void Chocolate::_8XY4(){
  * 
  */
 void Chocolate::_8XY5(){
-    V[0xF]= (V[X] - V[Y] < 0xFF) ? 1:0;
     V[X] -= V[Y];
+    V[0xF]= (V[X] < V[Y]) ? 0:1;
 }
 
 /**
@@ -301,7 +301,7 @@ void Chocolate::_8XY6(){
  * 
  */
 void Chocolate::_8XY7(){
-    V[0xF]= (V[Y] < V[X]) ? 0:1;
+    V[0xF] = (V[X] > V[Y]) ? 0:1;
     V[X] = V[Y] - V[X];
 }
 
@@ -335,7 +335,8 @@ void Chocolate::_ANNN(){
  * 
  */
 void Chocolate::_BNNN(){
-    I = NNN + V[0];
+    pc = NNN + V[0];
+    pcDelta = 0;
 }
 
 /**
@@ -389,7 +390,7 @@ void Chocolate::_EX9E(){
  * 
  */
 void Chocolate::_EXA1(){
-    pcDelta = (keymap[V[X]] != 0) ? 2:1;
+    pcDelta = (keymap[V[X]] == 0) ? 2:1;
 }
 
 /**
@@ -465,11 +466,10 @@ void Chocolate::_FX33(){
  * by 1 for each value written but I itself is left unmodified
  */
 void Chocolate::_FX55(){  
-    for(int i = 0; i <= V[X]; i++){
+    for(int i = 0; i <= X; i++){
         memory[I + i] = V[i];
     }
 
-    I += X + 1;
 }
 
 /**
@@ -483,4 +483,5 @@ void Chocolate::_FX65(){
     for(int i = 0; i <= X; i++){
         V[i] = memory[I+i];
     }
+
 }
