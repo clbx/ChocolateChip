@@ -1,6 +1,8 @@
 # ChocolateChip
 🍪 Round 2 With the CHIP-8 Emulator
 
+Almost finished, still has a few small bugs
+
 # Some very useful resources:
 
 [Chip 8's Wikipedia Page](https://en.wikipedia.org/wiki/CHIP-8)
