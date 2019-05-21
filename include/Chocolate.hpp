@@ -1,82 +1,100 @@
-#include "Logger.hpp"
-#include <sstream>
-
-class Chocolate
-{
-	public:
-
-		Logger logger;
-
-		Chocolate(const char gameFile[]);
-		Chocolate();
-		void reset();
-		void tick();
-		bool getPixel(int);
-		void setPixel(int,int,bool);
-		void setKey(int, bool);
-		bool getKey(int);
-		bool isBuzzer();
-		int getAddress();
-		unsigned char memory[4096];
-		unsigned char V[16];
-		unsigned short stack[16];
-		int stackPointer;
-		bool drawFlag;
-		bool keyStates[16]; // true for pressed, false for unpressed
-
-		unsigned short delayTimer;
-		unsigned short soundTimer;
-
-		//Opcodes
-		void _00E0();
-		void _00EE();
-		void _1NNN(unsigned short);
-		void _2NNN(unsigned short);
-		void _3XNN(unsigned short);
-		void _4XNN(unsigned short);
-		void _5XY0(unsigned short);
-		void _6XNN(unsigned short);
-		void _7XNN(unsigned short);
-		void _8XY0(unsigned short);
-		void _8XY1(unsigned short);
-		void _8XY2(unsigned short);
-		void _8XY3(unsigned short);
-		void _8XY4(unsigned short);
-		void _8XY5(unsigned short);
-		void _8XY6(unsigned short);
-		void _8XY7(unsigned short);
-		void _8XYE(unsigned short);
-		void _9XY0(unsigned short);
-		void _ANNN(unsigned short);
-		void _BNNN(unsigned short);
-		void _CXNN(unsigned short);
-		void _DXYN(unsigned short);
-		void _EX9E(unsigned short);
-		void _EXA1(unsigned short);
-		void _FX07(unsigned short);
-		void _FX0A(unsigned short);
-		void _FX15(unsigned short);
-		void _FX18(unsigned short);
-		void _FX1E(unsigned short);
-		void _FX29(unsigned short);
-		void _FX33(unsigned short);
-		void _FX55(unsigned short);
-		void _FX65(unsigned short);
+#include <stdint.h>
+#include <iostream>
+#include <random>
 
 
-	private:
-		
-		
-		unsigned short I;
-		unsigned short programCounter;
+class Chocolate{
+
+    private:
+        uint8_t memory[4068];
+        uint16_t I;
+        
+        uint16_t stack[16];
+        uint16_t sp;
+
+        uint8_t V[16];
+        uint8_t delay;
+        uint8_t sound;
+
+        uint16_t pc;
+        uint16_t pcDelta;
+        uint16_t op;
+
+        uint16_t NNN;
+        uint8_t NN;
+        uint8_t N;
+        uint8_t X;
+        uint8_t Y;
 
 
+        uint8_t fontset[80] =
+        {
+            0xF0, 0x90, 0x90, 0x90, 0xF0, //0
+            0x20, 0x60, 0x20, 0x20, 0x70, //1
+            0xF0, 0x10, 0xF0, 0x80, 0xF0, //2
+            0xF0, 0x10, 0xF0, 0x10, 0xF0, //3
+            0x90, 0x90, 0xF0, 0x10, 0x10, //4
+            0xF0, 0x80, 0xF0, 0x10, 0xF0, //5
+            0xF0, 0x80, 0xF0, 0x90, 0xF0, //6
+            0xF0, 0x10, 0x20, 0x40, 0x40, //7
+            0xF0, 0x90, 0xF0, 0x90, 0xF0, //8
+            0xF0, 0x90, 0xF0, 0x10, 0xF0, //9
+            0xF0, 0x90, 0xF0, 0x90, 0x90, //A
+            0xE0, 0x90, 0xE0, 0x90, 0xE0, //B
+            0xF0, 0x80, 0x80, 0x80, 0xF0, //C
+            0xE0, 0x90, 0x90, 0x90, 0xE0, //D
+            0xF0, 0x80, 0xF0, 0x80, 0xF0, //E
+            0xF0, 0x80, 0xF0, 0x80, 0x80  //F
+        };
 
-		// true following a tick where the sound timer expires
-		bool buzzer;
+        void _00E0();
+        void _00EE();
+        void _1NNN();
+        void _2NNN();
+        void _3XNN();
+        void _4XNN();
+        void _5XY0();
+        void _6XNN();
+        void _7XNN();
+        void _8XY0();
+        void _8XY1();
+        void _8XY2();
+        void _8XY3();
+        void _8XY4();
+        void _8XY5();
+        void _8XY6();
+        void _8XY7();
+        void _8XYE();
+        void _9XY0();
+        void _ANNN();
+        void _BNNN();
+        void _CXNN();
+        void _DXYN();
+        void _EX9E();
+        void _EXA1();
+        void _FX07();
+        void _FX0A();
+        void _FX15();
+        void _FX18();
+        void _FX1E();
+        void _FX29();
+        void _FX33();
+        void _FX55();
+        void _FX65();
 
+        void push(uint16_t);
+        uint16_t pop();
 
-		bool pixels[2048];
+    public:
+        uint8_t graphics[2048];
+        uint8_t keymap[16];
+        bool draw;
+        bool buzzer;
 
-		std::string logstmt;
+        Chocolate();
+
+        void tick();
+        void reset();
+        bool load(const char*);
 };
+

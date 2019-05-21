@@ -1,1050 +1,487 @@
-#include "../include/Chocolate.hpp"
-#include <fmt/core.h>
+#include "Chocolate.hpp"
 
-#include <cstdlib>
-#include <cstdio>
-#include <cstring>
+/**
+ * @brief Construct a new Chocolate:: Chocolate object
+ * 
+ */
+Chocolate::Chocolate(){}
 
-
-unsigned char chip8_fontset[80] = {
-    0xF0, 0x90, 0x90, 0x90, 0xF0, //0
-    0x20, 0x60, 0x20, 0x20, 0x70, //1
-    0xF0, 0x10, 0xF0, 0x80, 0xF0, //2
-    0xF0, 0x10, 0xF0, 0x10, 0xF0, //3
-    0x90, 0x90, 0xF0, 0x10, 0x10, //4
-	0xF0, 0x80, 0xF0, 0x10, 0xF0, //5
-	0xF0, 0x80, 0xF0, 0x90, 0xF0, //6    
-	0xF0, 0x10, 0x20, 0x40, 0x40, //7
-	0xF0, 0x90, 0xF0, 0x90, 0xF0, //8
-    0xF0, 0x90, 0xF0, 0x10, 0xF0, //9
-    0xF0, 0x90, 0xF0, 0x90, 0x90, //A
-    0xE0, 0x90, 0xE0, 0x90, 0xE0, //B
-    0xF0, 0x80, 0x80, 0x80, 0xF0, //C
-    0xE0, 0x90, 0x90, 0x90, 0xE0, //D
-    0xF0, 0x80, 0xF0, 0x80, 0xF0, //E
-    0xF0, 0x80, 0xF0, 0x80, 0x80  //F
-};
-
-Chocolate::Chocolate(const char gameFile[])
-{
-	reset();
-
-	FILE* file = fopen(gameFile, "r");
-
-	fread(memory + 0x200, 1, sizeof(memory) - 0x200, file);
-
-	fclose(file);
-
-	Logger logger;
-
-	//for (int i = 0; i < sizeof(memory); i += 2)
-	//	printf("(%d) %04X ", i, memory[i] << 8 | memory[i+1]);
-}
-
-
-
-Chocolate::Chocolate() //For Testing Purposes Only
-{
-
-	
-	reset();
-}
-
-
-
-
-
-
-void Chocolate::reset()
-{
+/**
+ * @brief resets the emulator
+ * 
+ */
+void Chocolate::reset(){
 	memset(memory, 0, sizeof(memory));
 	memset(V, 0, sizeof(V));
 	memset(stack, 0, sizeof(stack));
-	memset(keyStates, 0, sizeof(keyStates));
+	memset(keymap, 0, sizeof(keymap));
 
-	stackPointer = 0;
-	I = 200;
-	programCounter = 0x200;
+    sp = 0;
+    I = 200;
+    pc = 0x200;
 
-	delayTimer = 0;
-	soundTimer = 0;
+    delay = 0;
+    sound = 0;
 
-	buzzer = false;
+    buzzer = false;
+    draw = false;
 
-	drawFlag = false;
+    memset(graphics,0,2048);
 
-	memset(pixels, 0, 2048);
-
-	//Load font into memory
-
-
-	for(int i = 0; i < 80; i++){
-		memory[i] = chip8_fontset[i];
-	}
-
-	logstmt = "";
-
+    for(int i = 0; i < 80; i++){
+        memory[i] = fontset[i];
+    }
 }
 
-void Chocolate::tick()
-{
-	//Log message
-	
-	//Put in the program counter
-	logstmt += fmt::format("[{:X}]: ", programCounter);
-
-	unsigned short opcode = memory[programCounter] << 8;
-	opcode |= memory[programCounter + 1];
-
-	logstmt += fmt::format("{:X}",opcode);
-	/* Here we will check the opcode received and go through digit by
-	* digit to reach the corrrect opcode
-	*
-	* First we check the first digit by &ing it with 0xF000,
-	* After that we go to the next digit
-	*
-	* While we could check each individual opcode, this is faster and
-	* better practice
-	*/
-	switch (opcode & 0xF000) {
-		// All 0x0 Opcodes
-		case 0x0000:{
-			/* Since there are only 2 opcodes for the 0's (00E0, and 00EE)
-			*  We'll only check the last digit since its the only difference
-			*/
-			switch( opcode & 0x000F){
-				// 00E0
-				case 0x0000:{
-					_00E0();
-				}break;
-				// 00EE
-				case 0x000E:{
-					_00EE();
-				}break;
-				default:{}break;
-			}
-		}break;
-		// Only one opcode here 1NNN.
-		case 0x1000:{
-			_1NNN(opcode);
-		}break;
-		//Only one opcode here as well
-		case 0x2000:{
-			_2NNN(opcode);
-		}break;
-		case 0x3000:{
-			_3XNN(opcode);	
-		}break;
-		case 0x4000:{
-			_4XNN(opcode);
-		}break;
-		case 0x5000:{
-			_5XY0(opcode);
-		}break;
-		case 0x6000:{
-			_6XNN(opcode);
-		}break;
-		case 0x7000:{
-			_7XNN(opcode);
-		}break;
-		case 0x8000:{
-			switch(opcode & 0x000F){
-				case 0x0000:{
-					_8XY0(opcode);
-				}break;
-				case 0x0001:{
-					_8XY1(opcode);
-				}break;
-				case 0x0002:{
-					_8XY2(opcode);
-				}break;
-				case 0x0003:{
-					_8XY3(opcode);
-				}break;
-				case 0x0004:{
-					_8XY4(opcode);
-				}break;
-				case 0x0005:{
-					_8XY5(opcode);
-				}break;
-				case 0x0006:{
-					_8XY6(opcode);
-				}break;
-				case 0x0007:{
-					_8XY7(opcode);
-				}break;
-				case 0x000E:{
-					_8XYE(opcode);
-				}break;
-			}
-		}break;
-		case 0x9000:{
-			_9XY0(opcode);
-		}break;
-		case 0xA000:{
-			_ANNN(opcode);
-		}break;
-		case 0xB000:{
-			_BNNN(opcode);
-		}break;
-		case 0xC000:{
-			_CXNN(opcode);
-		}break;
-		case 0xD000:{
-			_DXYN(opcode);
-		}break;
-		case 0xE000:{
-			switch(opcode & 0x000F){
-				case 0x000E:{
-					_EX9E(opcode);
-				}break;
-				case 0x0001:{
-					_EXA1(opcode);
-				}break;
-			}
-		}break;
-		case 0xF000:{
-			switch(opcode & 0x00FF){
-				case 0x0007:{
-					_FX07(opcode);
-				}break;
-				case 0x000A:{
-					_FX0A(opcode);
-				}break;
-				case 0x0015:{
-					_FX15(opcode);
-				}break;
-				case 0x0018:{
-					_FX18(opcode);
-				}break;
-				case 0x0029:{
-					_FX29(opcode);
-				}break;
-				case 0x001E:{
-					_FX1E(opcode);
-				}break;
-				case 0x0033:{
-					_FX33(opcode);
-				}break;
-				case 0x0055:{
-					_FX55(opcode);
-				}break;
-				case 0x0065:{
-					_FX65(opcode);
-				}break;
-			}
-		}break;
-		default:{
-			logstmt += fmt::format("Unknown Opcode Read {:X}",opcode);
-			programCounter += 2;
-		}
-	}
-	logstmt += "\n"; //Give it an endline
-	logger.store(logstmt);
-	logstmt = ("");
-
-	if(delayTimer > 0)
-		delayTimer--;
-	
-	if(soundTimer > 0)
-		soundTimer--;
-}
-
-
-/******************
-OPCODE FUNCTIONS
-Opcodes
-*******************/
-
-/** 00E0
- * @brief Clears the screen
+/**
+ * @brief loads a ROM into memory
  * 
+ * @param filename 
+ * @return true file loaded successfully
+ * @return false file loading failed
+ */
+bool Chocolate::load(const char* filename){
+
+    reset();
+
+    FILE* file = fopen(filename, "r");
+    if(file == nullptr){
+        return false;
+    }
+    fread(memory + 0x200,1,sizeof(memory) - 0x200, file);
+    fclose(file);
+
+    //TODO: Come back and add validation
+    return true;
+
+}
+
+/**
+ * @brief ticks the cpu once
+ * 
+ */
+void Chocolate::tick(){
+    //Get Opcode
+    op = memory[pc] << 8 | memory[pc +1 ];
+  
+    //Get operands
+    NNN = (op & 0x0FFF);
+    NN = (op & 0x00FF);
+    N = (op & 0x000F);
+    X = (op & 0x0F00) >> 8;
+    Y = (op & 0x00F0) >> 4;
+
+    //Reset Program Counter Delta
+    pcDelta = 1;
+
+    switch(op & 0xF000){
+        case 0x0000:{
+            switch(op & 0x000F){
+                case 0x0000:{_00E0();}break;
+                case 0x000E:{_00EE();}break;
+            }
+        }break;
+        case 0x1000:{_1NNN();}break;
+        case 0x2000:{_2NNN();}break;
+        case 0x3000:{_3XNN();}break;
+        case 0x4000:{_4XNN();}break;
+        case 0x5000:{_5XY0();}break;
+        case 0x6000:{_6XNN();}break;
+        case 0x7000:{_7XNN();}break;
+        case 0x8000:{
+            switch(op & 0x000F){
+                case 0x0000:{_8XY0();}break;
+                case 0x0001:{_8XY1();}break;
+                case 0x0002:{_8XY2();}break;
+                case 0x0003:{_8XY3();}break;
+                case 0x0004:{_8XY4();}break;
+                case 0x0005:{_8XY5();}break;
+                case 0x0006:{_8XY6();}break;
+                case 0x0007:{_8XY7();}break;
+                case 0x000E:{_8XYE();}break;
+            }
+        }break;
+        case 0x9000:{_9XY0();}break;
+        case 0xA000:{_ANNN();}break;
+        case 0xB000:{_BNNN();}break;
+        case 0xC000:{_CXNN();}break;
+        case 0xD000:{_DXYN();}break;
+        case 0xE000:{
+            switch(op & 0x000F){
+                case 0x000E:{_EX9E();}break;
+                case 0x0001:{_EXA1();}break;
+            }
+        }break;
+        case 0xF000:{
+            switch(op & 0x0FF){
+                case 0x0007:{_FX07();}break;
+                case 0x000A:{_FX0A();}break;
+                case 0x0015:{_FX15();}break;
+                case 0x0018:{_FX18();}break;
+                case 0x0029:{_FX29();}break;
+                case 0x001E:{_FX1E();}break;
+                case 0x0033:{_FX33();}break;
+                case 0x0055:{_FX55();}break;
+                case 0x0065:{_FX65();}break;
+            }
+        }break;
+        default:{printf("unknown opcode");}
+    }
+
+    if(delay > 0)
+        delay--;
+    if(sound > 0)
+        sound--;
+
+
+    printf("%04X : %04X \n",pc,op);
+
+    printf("NNN:%03X NN:%02X N:%1X X:%1X Y:%1X   I:%d (%03X)\n",NNN,NN,N,X,Y,I,I);
+
+    for(int i = 0; i < 16; i++){
+        printf("%X:%02X ",i,V[i]);
+    }
+    printf("\n");
+
+    /*
+    for(int i = 0x200; i < 800; i++){
+        printf("%04X",memory[i]);
+    }
+    printf("\n");
+    */
+    
+
+    pc += 2 * pcDelta;
+}
+
+
+/**
+ * @brief Clears the screen
  * 
  */
 void Chocolate::_00E0(){
-	logstmt += "(00E0 : 00E0) ";
-
-	for(int i = 0; i < 2048; i++){
-		pixels[i] = 0;
-	}
-	
-	logstmt += "Screen Cleared";
-
-	drawFlag = true;
-	programCounter += 2;
+    memset(graphics,0,2048);
+    draw = true;
 }
 
-
-/** 00E0
- * @brief Returns from a subroutine
+/**
+ * @brief Return from a subroutine
  * 
  */
 void Chocolate::_00EE(){
-	logstmt += "(00EE : 00EE) ";
-
-	--stackPointer;
-	programCounter = stack[stackPointer];
-	programCounter += 2;
-	//SH = Stack Height,
-	logstmt += fmt::format("Returning from sub. SH[{}]",stackPointer);
-}
-
-/** 1NNN
- * @brief Jumps to a memory address
- * 
- * @param opcode NNN: Memory Address to jump to 
- * 
- */
-void Chocolate::_1NNN(unsigned short opcode){
-	logstmt += fmt::format("(1NNN : {:X}) ",opcode & 0xFFFF);
-	/*
-	* By using the & function we are able to get parts of the opcode that we want
-	* However if they are not in the last few digits they must be bit shifted
-	*/
-	unsigned short I = (opcode & 0x0FFF);
-	logstmt += fmt::format("Jumping to address: {:X}",I);
-	//logstmt << "Jumping to: " << std::hex << address << std::dec;
-	programCounter = I;
-}
-
-/** 2NNN
- * @brief Calls a subroutine at addr
- * 
- * @param opcode NNN: Memory address where subroutine is
- */
-void Chocolate::_2NNN(unsigned short opcode){
-	logstmt += fmt::format("(2NNN : {:X}) ",opcode & 0xFFFF);
-
-	stack[stackPointer] = programCounter; //Put the current location on the stack
-	unsigned short I = (opcode & 0x0FFF);
-	
-	//Log
-	logstmt += fmt::format("Storing {:X} at Stack[{}]. Jumping to {:X}",programCounter,stackPointer,I);
-	stackPointer++;//Increase the stack pointer
-	programCounter = I; // Jump to new location
-}
-
-/** 3XNN
- * @brief Skips the next instruction if the the Vx equals NN
- * 
- * @param opcode Vx: The register to check
- *               NN: The value to check against
- */
-void Chocolate::_3XNN(unsigned short opcode){
-	logstmt += fmt::format("(3XNN : {:X}) ",opcode & 0xFFFF);
-
-	int index = (opcode & 0x0F00) >> 8;
-	int regNum = V[index];
-	int val = opcode & 0x00FF;
-
-	logstmt += fmt::format("V[{}] =  {}({:X}) ",index,regNum,regNum);
-
-
-	if(regNum == val){
-		logstmt += fmt::format("== {}({:X}) Skipping Next Instruction",val,val);
-		programCounter += 4;
-	}
-	else{
-		logstmt += fmt::format("!= {}({:X}) Continuing",val,val);
-		programCounter += 2;
-	}
-
-}
-
-/** 4XNN
- * @brief Skips next instruction is Vx != NN (Opposite of 3XNN)
- * 
- * @param opcode Vx: The register to check
- *               NN: The value to check against
- */
-void Chocolate::_4XNN(unsigned short opcode){
-	logstmt += fmt::format("(4XNN : {:X}) ",opcode & 0xFFFF);
-
-	int index = (opcode & 0x0F00) >> 8;
-	int val = opcode & 0x00FF;
-	int regNum = V[index];
-
-
-	logstmt += fmt::format("V[{}] =  {}({:X}) ",index,regNum,regNum);
-
-
-	if(regNum != val){
-		logstmt += fmt::format("!= {}({:X}) Skipping Next Instruction",val,val);
-		programCounter += 4;
-	}
-	else{
-		logstmt += fmt::format("== {}({:X}) Continuing",val,val);
-		programCounter += 2;
-	}
-
-}
-
-
-/** 5XY0
- *  @brief Skips the next instruction if V(x) = V(y)
- *
- *  @param opcode X: V(x) the first register
- *  		  Y: V(y) the second register
- *
- */
-void Chocolate::_5XY0(unsigned short opcode){
-	logstmt += fmt::format("(5XY0 : {:X}) ",opcode & 0xFFFF);
-
-	int x = (opcode & 0x0F00) >> 8;
-	int y = (opcode & 0x00F0) >> 4;
-
-	unsigned char xVal = V[x];
-	unsigned char yVal = V[y];
-
-
-	if(xVal == yVal){
-		logstmt += fmt::format("V[{}] = {:X} == V[{}] = {:X} Skipping Next Instruction",x,xVal,y,yVal);
-		programCounter += 4;
-	}
-	else{
-		logstmt += fmt::format("V[{}] = {:X} != V[{}] = {:X} Continuing",x,xVal,y,yVal);
-		programCounter += 2;
-	}	
-}
-
-
-
-/** 6XNN
- * @brief Sets V(x) to NN 
- * 
- * @param opcode x: V(x) register to change
- *               NN: The data to set the register too
- *
- */
-void Chocolate::_6XNN(unsigned short opcode){
-	logstmt += fmt::format("(6XNN : {:X}) ",opcode & 0xFFFF);
-
-	int index = (opcode & 0x0F00) >> 8;
-	int val = opcode & 0x00FF;
-	
-	logstmt += fmt::format("V[{}] = {:X}",index,val);
-
-	V[index] = val;
-
-	programCounter += 2;
-	
-}
-
-/** 7XNN
- * @brief Adds NN to V(x) 
- * 
- * @param opcode x: V(x) the register to add too
- *              NN: The amount to add
- */
-void Chocolate::_7XNN(unsigned short opcode){
-	logstmt += fmt::format("(7XNN : {:X}) ",opcode & 0xFFFF);
-
-	int index = (opcode & 0x0F00) >> 8;
-	unsigned char add = opcode & 0x00FF;
-	logstmt += fmt::format("V[{}] += {}",index,add);
-	V[index] += add;
-
-	programCounter += 2;
-}
-
-/** 8XY0
- * @brief Sets V(x) to V(y)
- * 
- * @param opcode x: the first register
- *               y: the second register
- */
-void Chocolate::_8XY0(unsigned short opcode){
-	logstmt += fmt::format("(8XY0 : {:X}) ",opcode & 0xFFFF);
-
-	int xIndex = (opcode & 0x0F00) >> 8;
-	int yIndex = (opcode & 0x00F0) >> 4;
-
-	logstmt += fmt::format("V[{}] = V[{}]",xIndex,yIndex);
-
-	unsigned char yVal = V[yIndex];
-
-	V[xIndex] = yVal;
-
-	programCounter += 2;
-
-}
-
-/** 8XY1
- * @brief Bitwise OR, sets V(x) to V(x)|V(y)
- * 
- * @param opcode x: the first register
- *               y: the second register
- */
-void Chocolate::_8XY1(unsigned short opcode){
-	logstmt += fmt::format("(8XY1 : {:X}) ",opcode & 0xFFFF);
-
-	int xIndex = (opcode & 0x0F00) >> 8;
-	int yIndex = (opcode & 0x00F0) >> 4;
-
-	unsigned char yVal = V[yIndex];
-	unsigned char xVal = V[xIndex];
-
-	unsigned char orVal = xVal|yVal;
-
-	V[xIndex] = orVal;
-
-	programCounter += 2;
-}
-
-/** 8XY2
- * @brief Bitwise AND, sets V(x) to V(x)&V(y)
- * 
- * @param opcode x: the first register
- *               y: the second register
- */
-void Chocolate::_8XY2(unsigned short opcode){
-	logstmt += fmt::format("(8XY2 : {:X}) ",opcode & 0xFFFF);
-
-	int xIndex = (opcode & 0x0F00) >> 8;
-	int yIndex = (opcode & 0x00F0) >> 4;
-
-	unsigned char yVal = V[yIndex];
-	unsigned char xVal = V[xIndex];
-
-	unsigned char andVal = xVal&yVal;
-
-	V[xIndex] = andVal;
-
-	programCounter += 2;
+    sp--;
+    pc = stack[sp];              
 }
 
 /**
- * @brief Bitwise XOR, sets V(x) to V(x)^V(y)
+ * @brief Jumps to NNN
  * 
- * @param opcode x: the first register
- *               y: the second register
  */
-void Chocolate::_8XY3(unsigned short opcode){
-	logstmt += fmt::format("(8XY3 : {:X}) ",opcode & 0xFFFF);
-
-	int xIndex = (opcode & 0x0F00) >> 8;
-	int yIndex = (opcode & 0x00F0) >> 4;
-
-	unsigned char yVal = V[yIndex];
-	unsigned char xVal = V[xIndex];
-
-
-	unsigned char xorVal = xVal^yVal;
-	V[xIndex] = xorVal;
-
-	logstmt += fmt::format("V[{:X}] = V[{:X}] ({:X}) ^ V[{:X}] ({:X}) = {:X}",xIndex,xIndex,xVal,yIndex,yVal,xorVal);
-
-	programCounter += 2;
-
-}
-
-/** 8XY4
- * @brief V[x] += V[y]
- * 
- * @param opcode x: the first register 
- *               y: the second register
- */       
-
-void Chocolate::_8XY4(unsigned short opcode){
-	logstmt += fmt::format("(8XY4 : {:X}) ",opcode & 0xFFFF);
-
-	int xIndex = (opcode & 0x0F00) >> 8;
-	int yIndex = (opcode & 0x00F0) >> 4;
-
-	unsigned char yVal = V[yIndex];
-	unsigned char xVal = V[xIndex];
-
-	V[xIndex] = yVal + xVal;
-	logstmt += fmt::format("V[{:X}] = V[{:X}] ({:X}) + V[{:X}] ({:X})",xIndex,xIndex,xVal,yIndex,yVal);
-
-	if(xVal + yVal > 0xFF){
-		V[0xF] = 1;
-	}
-	else{
-		V[0xF] = 0;
-	}
-	
-	programCounter += 2;
-
+void Chocolate::_1NNN(){
+    pc = NNN;
+    pcDelta = 0;
 }
 
 /**
- * @brief V[x] -= V[y]
+ * @brief Calls subroutine at NNN
  * 
- * @param opcode x: the first register
- *               y: the second register
  */
-void Chocolate::_8XY5(unsigned short opcode){
-	logstmt += fmt::format("(8XY5 : {:X}) ",opcode & 0xFFFF);
-
-	int xIndex = (opcode & 0x0F00) >> 8;
-	int yIndex = (opcode & 0x00F0) >> 4;
-
-	unsigned char yVal = V[yIndex];
-	unsigned char xVal = V[xIndex];
-
-	V[xIndex] = xVal - yVal;
-
-	logstmt += fmt::format("V[{:X}] += V[{:X}] ({:X})",xIndex,yIndex,yVal);
-
-	if(xVal - yVal < 0xFF){
-		V[0xF] = 1;
-	}
-	else{
-		V[0xF] = 0;
-	}
-	
-	programCounter += 2;
-
+void Chocolate::_2NNN(){
+    stack[sp] = pc;
+    sp++;
+    pc = NNN;
+    pcDelta = 0;
 }
 
 /**
- * @brief Stores least signfigiant bit of V[X] in V[F] and shifts by 1
+ * @brief Skips the next instruction if V[X] = NN
  * 
- * @param opcode x: the register to use
  */
-void Chocolate::_8XY6(unsigned short opcode){
-	logstmt += fmt::format("(8XY6 : {:X}) ",opcode & 0xFFFF);
-
-	int xIndex = (opcode & 0x0F00) >> 8;
-
-	V[0xF] = V[xIndex] & 0x1;
-	V[xIndex] >>= 1;
-
-	programCounter += 2;
-}
-
-/**
- * @brief Sets V[X] to V[X] - V[Y]. If there's a borrow V[F] is set to 0
- * 
- * @param opcode x: first register
- *				 y: second register
- */
-void Chocolate::_8XY7(unsigned short opcode){
-	logstmt += fmt::format("(8XY7 : {:X}) ",opcode & 0xFFFF);
-
-	int xIndex = (opcode & 0x0F00) >> 8;
-	int yIndex = (opcode & 0x00F0) >> 4;
-
-	unsigned char yVal = V[yIndex];
-	unsigned char xVal = V[xIndex];
-
-	V[xIndex] = yVal - xVal;
-
-	if(xVal > yVal){
-		V[0xF] = 0;
-	}
-	else{
-		V[0xF] = 1;
-	}
-
-	programCounter += 2;
-}
-
-/**
-* @brief Sets the most signifigant bit of V[x] in V[F] then shifts to the left
-*
-* @param opcode x: the register to use
-*
-*/
-void Chocolate::_8XYE(unsigned short opcode){
-	logstmt += fmt::format("(8XYE : {:X}) ",opcode & 0xFFFF);
-
-	int xIndex = (opcode & 0x0F00) >> 8;
-
-	V[0xF] = V[xIndex] >> 7;
-	V[xIndex] <<= 1;
-
-	programCounter += 2;
-
+void Chocolate::_3XNN(){
+    pcDelta = (V[X] == NN) ? 2:1;
 }
 
 
 /**
-* @breif Skip next instruction if V[x] != V[y]
-*
-* @param x: the first register
-*        y: the second register
-*
-*/
-void Chocolate::_9XY0(unsigned short opcode){
-	logstmt += fmt::format("(9XY0 : {:X}) ",opcode & 0xFFFF);
-
-	int xIndex = (opcode & 0x0F00) >> 8;
-	int yIndex = (opcode & 0x00F0) >> 4;
-
-	unsigned char yVal = V[yIndex];
-	unsigned char xVal = V[xIndex];
-
-	if(xVal != yVal){
-		programCounter += 4;
-	}
-	else
-	{
-		programCounter += 2;
-	}
-	
+ * @brief Skips the next instructio if V[X] != NN
+ * 
+ */
+void Chocolate::_4XNN(){
+    pcDelta = (V[X] != NN) ? 2:1;
 }
 
 
 /**
-* @breif Sets I to NNN
-*
-* @param NNN: The address to move to
-*
-*/
-void Chocolate::_ANNN(unsigned short opcode){
-	logstmt += fmt::format("(ANNN : {:X}) ",opcode & 0xFFFF);
+ * @brief Skips the next instruction if V[X] == V[Y]
+ * 
+ */
+void Chocolate::_5XY0(){
+    pcDelta = (V[X] == V[Y]) ? 2:1;
+}
 
-	unsigned short addr = opcode & 0x0FFF;
+/**
+ * @brief Sets V[X] to NN
+ * 
+ */
+void Chocolate::_6XNN(){
+    V[X] = NN;
+}
 
-	logstmt += fmt::format("I = {:X}",addr);
-	I = addr; 
+/**
+ * @brief Adds NN to V[X] (Ignores Carry Flag)
+ * 
+ */
+void Chocolate::_7XNN(){
+    V[X] += NN;
+}
 
-	programCounter += 2;
+/**
+ * @brief Sets V[X] to V[Y]
+ * 
+ */
+void Chocolate::_8XY0(){
+    V[X] = V[Y];
+}
+
+/**
+ * @brief Sets V[X] to V[X] | V[Y]
+ * 
+ */
+void Chocolate::_8XY1(){
+    V[X] |= V[Y];
+}
+
+/**
+ * @brief Sets V[X] to V[X] & V[Y] 
+ * 
+ */
+void Chocolate::_8XY2(){
+    V[X] &= V[Y];    
+}
+
+/**
+ * @brief Set V[X] to V[X] ^ V[Y]
+ * 
+ */
+void Chocolate::_8XY3(){
+    V[X] ^= V[Y];
+}
+
+/**
+ * @brief Adds V[Y] to V[X]. V[F] is set to 1 when there is a carry and 0 when there isn't
+ * 
+ */
+void Chocolate::_8XY4(){
+    
+    V[X] += V[Y];
+    V[0xF] = (V[Y] > (0xFF - V[X])) ? 1:0;
 
 }
 
 /**
-* @breif Jumps to NNN + V[0]
-*
-* @param NNN: The address + V[0] to jump to
-*
-*/
-void Chocolate::_BNNN(unsigned short opcode){
-	logstmt += fmt::format("(BXNN : {:X}) ",opcode & 0xFFFF);
-
-	unsigned short addr = (opcode & 0x0FFF);
-	unsigned char addVal = V[0];
-
-
-	logstmt += fmt::format("I = I + V[0]  -   I = {:X} + {:X}",addr,addVal);
-	I = addr + addVal;
-
+ * @brief V[Y] is subtraced from V[X]. V[F] is set to 0 when there is a borrow and 1 where there isnt
+ * 
+ */
+void Chocolate::_8XY5(){
+    V[X] -= V[Y];
+    V[0xF]= (V[X] < V[Y]) ? 0:1;
 }
 
 /**
-* @brief Sets V[x] to a random number masked by NN
-*
-* @param X: The register to set
-*       NN: The random mask
-*/
-void Chocolate::_CXNN(unsigned short opcode){
-	logstmt += fmt::format("(CXNN : {:X}) ",opcode & 0xFFFF);
-
-	int index = (opcode & 0x0F00) >> 8;
-	unsigned char mask = (opcode & 0x00FF);
-	unsigned char val = rand() & mask;
-	logstmt += fmt::format("Setting V[{:X}] to random value {}, Mask {}",index,val,mask);
-
-	V[index] = val; 
-
-	programCounter += 2;
+ * @brief Stores the least signifigant bit of V[X] in V[F] and then shifts V[X] to the right by 1
+ * 
+ */
+void Chocolate::_8XY6(){
+    V[0xF] = V[X] & 0x0001; //Get least signifigant bit
+    V[X] >>= 1;                    
 }
 
 /**
-* @breif Draws a sprite at coords V[X] & V[Y] with a height of N.
-*        Gets the sprite data from I in memory
-*
-* @param X: The register to check for the X coord
-*        Y: The reigster to check for the Y coord
-*        N: How tall the sprite is
-*/
-void Chocolate::_DXYN(unsigned short opcode){
-	logstmt += fmt::format("(DXYN : {:X}) ",opcode & 0xFFFF);
+ * @brief Sets V[X] to V[Y] - V[X]. V[F] is set to 0 when there is a borrow, 1 when there isn't
+ * 
+ */
+void Chocolate::_8XY7(){
+    V[0xF] = (V[X] > V[Y]) ? 0:1;
+    V[X] = V[Y] - V[X];
+}
 
-	unsigned short x = V[(opcode & 0x0F00) >> 8];
-    unsigned short y = V[(opcode & 0x00F0) >> 4];
-    unsigned short height = opcode & 0x000F;
-    unsigned short pixel;
+/**
+ * @brief Stores the most signifigant bit of V[X] in V[F] then shifts V[F] to the left by 1
+ * 
+ */
+void Chocolate::_8XYE(){
+    V[0xF] = V[X] >> 7; //Get most signifigant bit
+    V[X] <<= 1;
+}
 
-	logstmt += fmt::format("Drawing sprite from I={}, At ({},{}) Height {}",I,x,y,height);
+/**
+ * @brief Skips the next instruction if V[X] != V[Y]
+ * 
+ */
+void Chocolate::_9XY0(){
+    pcDelta = (V[X] != V[Y]) ? 2:1;
+}
 
+/**
+ * @brief Sets I to the address NNN
+ * 
+ */
+void Chocolate::_ANNN(){
+    I = NNN;
+}
+
+/**
+ * @brief Jups to the address NNN plus V[0]
+ * 
+ */
+void Chocolate::_BNNN(){
+    pc = NNN + V[0];
+    pcDelta = 0;
+}
+
+/**
+ * @brief Sets V[X] to the result of a bitwise and operation on a random number (Typically 0 to 255) and NN
+ * 
+ */
+void Chocolate::_CXNN(){
+    V[X] = ((rand() % (0xFF +1)) & NN);
+}
+
+/**
+ * @brief Draws a sprite at (V[X],V[Y]) that has a width of 8 pixels and a height of N pixels
+ * Each row of 8 blices is read as a bit-coded from memory location I; I value doesn't change after 
+ * execution. As described above V[F] is set to 1 if any pixels are flipped from the set to unset when the
+ * sprite is drawn, and to 0 if that doesn't happen
+ */
+void Chocolate::_DXYN(){
+
+    uint16_t pixel;
+    
     V[0xF] = 0;
-    for (int yline = 0; yline < height; yline++){
+
+    uint8_t x = V[X];
+    uint8_t y = V[Y];
+
+    for (int yline = 0; yline < N; yline++){
         pixel = memory[I + yline];
         for(int xline = 0; xline < 8; xline++){
             if((pixel & (0x80 >> xline)) != 0){
-                if(pixels[(x + xline + ((y + yline) * 64))] == 1){
+                if(graphics[(x + xline + ((y + yline) * 64))] == 1){
                     V[0xF] = 1;
                 }
-                pixels[x + xline + ((y + yline) * 64)] ^= 1;
+                graphics[x + xline + ((y + yline) * 64)] ^= 1;
             }
         }
     }
 
-	drawFlag = true;
+    draw = true;
+}
 
-    programCounter += 2;
+/**
+ * @brief Skips the next instruction if the key stored in V[X] is pressed
+ * 
+ */
+void Chocolate::_EX9E(){
+    pcDelta = (keymap[V[X]] != 0) ? 2:1;    
+}
+
+/**
+ * @brief Skips the next instruction if the key stored in V[X] isn't pressed
+ * 
+ */
+void Chocolate::_EXA1(){
+    pcDelta = (keymap[V[X]] == 0) ? 2:1;
+}
+
+/**
+ * @brief Sets V[X] to the value of the delay timer
+ * 
+ */
+void Chocolate::_FX07(){
+    V[X] = delay;
+}
+
+/**
+ * @brief A key press is awaited, and then stored in V[X]
+ * 
+ */
+void Chocolate::_FX0A(){
+    bool keypress = false;
+
+    for(int i = 0; i < 16; i++){
+        if(keymap[i] != 0){
+            V[X] = i;
+            keypress = true;
+        }
+    }
+    if(!keypress){
+        pcDelta = 0;
+    }
+}
+
+/**
+ * @brief Sets the delay timer to V[X]
+ * 
+ */
+void Chocolate::_FX15(){
+    delay = V[X];    
+}
+
+/**
+ * @brief Sets the sound timer to V[X]
+ * 
+ */
+void Chocolate::_FX18(){
+    sound = V[X];
+}
+
+/**
+ * @brief Adds V[X] to I. Set V[F] if there is a overflow
+ * 
+ */
+void Chocolate::_FX1E(){
+    V[0xF] = ((I + V[X]) > 0xFFF) ? 1:0; 
+    I += V[X];
+}
+
+/**
+ * @brief Sets I to the location of the sprice to the character in V[X] (0-F)
+ * 
+ */
+void Chocolate::_FX29(){
+    I = V[X] * 0x5;
+}
+
+/**
+ * @brief Stores the BCD respresentation of V[X]. 100's digit at I, 10's at I+1, I's at I+2
+ */
+void Chocolate::_FX33(){
+        memory[I] = V[X] /100;
+        memory[I+1] = (V[X] /10)%10;
+        memory[I+2] = V[X] % 10;
+}
+
+/**
+ * @brief Stores V[0] to V[X] in memory starting at address I. The offset from I is increased
+ * by 1 for each value written but I itself is left unmodified
+ */
+void Chocolate::_FX55(){  
+    for(int i = 0; i <= X; i++){
+        memory[I + i] = V[i];
+    }
 
 }
 
 /**
-* @breif Skips the next instruction of the key stored in V[X] is pressed
-*
-* @param X: The register to check
-*
-*/
-void Chocolate::_EX9E(unsigned short opcode){
-	logstmt += fmt::format("(EX9E : {:X}) ",opcode & 0xFFFF);
+ * @brief Fills V[0] to V[X] with falues from memory starting at address I. The offset from I
+ * is increased by 1 for each value written, but I itself is left unmodified 
+ * 
+ */
 
-	unsigned char reg = (opcode & 0x0F00) >> 8;
-	bool key = keyStates[reg];
 
-	if(key){
-		programCounter += 4;
-	}
-	else{
-		programCounter += 2;
-	}
-}
+void Chocolate::_FX65(){
+    for(int i = 0; i <= X; i++){
+        V[i] = memory[I+i];
+    }
 
-/**
-* @breif
-*
-* @param
-*
-*/
-void Chocolate::_EXA1(unsigned short opcode){
-	logstmt += fmt::format("(EXA1 : {:X}) ",opcode & 0xFFFF);
-
-	unsigned char reg = (opcode & 0x0F00) >> 8;
-	bool key = keyStates[reg];
-
-	if(!key){
-		programCounter += 4;
-	}
-	else{
-		programCounter += 2;
-	}
-}
-
-/**
-* @breif
-*
-* @param
-*
-*/
-void Chocolate::_FX07(unsigned short opcode){
-	logstmt += fmt::format("(FX07 : {:X}) ",opcode & 0xFFFF);
-
-	unsigned char reg = (opcode & 0x0F00) >> 8;
-	
-	V[reg] = delayTimer;
-
-	logstmt += fmt::format("V[{:X}] = Delay Timer = {:X}",reg,delayTimer);
-
-	programCounter += 2;
-}
-
-/**
-* @breif
-*
-* @param
-*
-*/
-void Chocolate::_FX0A(unsigned short opcode){
-	logstmt += fmt::format("(FX0A : {:X}) ",opcode & 0xFFFF);
-
-	bool pressed = false;
-	unsigned char reg = (opcode & 0x0F00) >> 8;
-
-
-	for(int i = 0; i < 16; i++){
-		if(keyStates[i]){
-			logstmt += fmt::format("Got keypress");
-			V[reg] = i;
-			pressed = true;
-		}
-	}
-	if(pressed){
-		programCounter += 2;
-	}
-}
-
-/**
-* @breif
-*
-* @param
-*
-*/
-void Chocolate::_FX15(unsigned short opcode){
-	logstmt += fmt::format("(FX15 : {:X}) ",opcode & 0xFFFF);
-
-	unsigned char reg = (opcode & 0x0F00) >> 8;
-	unsigned char val = V[reg];
-
-	logstmt += fmt::format("Delay Timer = V[{:X}] = {:X}",reg,val);
-
-	delayTimer = val;
-
-	programCounter += 2;
-}
-
-/**
-* @breif
-*
-* @param
-*
-*/
-void Chocolate::_FX18(unsigned short opcode){
-	logstmt += fmt::format("(FX18 : {:X}) ",opcode & 0xFFFF);
-
-	unsigned char reg = (opcode & 0x0F00) >> 8;
-	unsigned char val = V[reg];
-
-	soundTimer = val;
-
-	programCounter += 2;
-
-}
-
-/**
-* @breif
-*
-* @param
-*
-*/
-void Chocolate::_FX1E(unsigned short opcode){
-	logstmt += fmt::format("(FX1E : {:X}) ",opcode & 0xFFFF);
-
-	unsigned char reg = (opcode & 0x0F00) >> 8;
-	unsigned char val = V[reg];
-
-	if((val + I) > 0xFFF){
-		V[0xF] = 1;
-		logstmt += fmt::format("val > 0xFFF: V[0xF] = 1");
-	}
-	else{
-		V[0xF] = 0;
-	}
-
-	unsigned short oldI = I;
-	
-	I += val;
-
-	logstmt += fmt::format("I = I {:X} + {:X} = {:X}",oldI,val,I);
-
-	programCounter += 2;
-
-}
-
-/**
-* @breif
-*
-* @param
-*
-*/
-void Chocolate::_FX29(unsigned short opcode){
-	logstmt += fmt::format("(FX29 : {:X}) ",opcode & 0xFFFF);
-
-	unsigned char reg = (opcode & 0x0F00) >> 8;
-	unsigned short val = V[reg] * 0x5;
-
-	I = val;
-
-	programCounter += 2;
-
-}
-
-/**
-* @breif
-*
-* @param
-*
-*/
-void Chocolate::_FX33(unsigned short opcode){
-	logstmt += fmt::format("(FX33 : {:X}) ",opcode & 0xFFFF);
-	unsigned char reg = (opcode & 0x0F00) >> 8;
-	unsigned char val = V[reg];
-	
-	memory[I] = val / 100;
-	memory[I + 1] = (val / 10) % 10;
-	memory[I + 2] = val % 10;
-
-	programCounter += 2;
-}
-
-/**
-* @breif
-*
-* @param
-*
-*/
-void Chocolate::_FX55(unsigned short opcode){
-	logstmt += fmt::format("(FX55 : {:X}) ",opcode & 0xFFFF);
-
-	unsigned char limit = (opcode & 0x0F00) >> 8;
-
-	logstmt += fmt::format("Offsetting registers by {:X}",limit);
-	for(int i = 0; i <= limit; i++){
-		memory[I + i] = V[i];
-	}
-
-
-
-	I += limit + 1;
-
-	programCounter += 2;
-
-}
-
-/**
-* @breif
-*
-* @param
-*
-*/
-void Chocolate::_FX65(unsigned short opcode){
-	logstmt += fmt::format("(FX65 : {:X}) ",opcode & 0xFFFF);
-
-	unsigned char limit = (opcode & 0x0F00) >> 8;
-
-	logstmt += fmt::format("Filling registers from {:X}",limit);
-	for(int i = 0; i <= limit; i++){
-		V[i] = memory[I + i];
-	}
-
-	I += limit + 1;
-
-	programCounter += 2;
-
-}
-
-
-
-
-
-
-
-
-/***********************************
-AUXILLARY FUNCTIONS
-Functions that are commonly used 
-************************************/
-
-int Chocolate::getAddress(){
-	return I;
-}
-
-bool Chocolate::getPixel(int x){
-	return pixels[x];
-}
-
-void Chocolate::setPixel(int x, int y, bool value){
-	pixels[x + 64*y] = value;
-}
-
-void Chocolate::setKey(int key, bool isPressed){
-	keyStates[key] = isPressed;
-}
-
-bool Chocolate::getKey(int key){
-	if(keyStates[key] != 0)
-		return 1;
-	return 0;
-}
-
-bool Chocolate::isBuzzer(){
-	return buzzer;
 }
