@@ -22,4 +22,4 @@ Things left I want to do:
 * **SDL instead of SFML** I've found SDL to be much easier to use, plus it's much more widespread.
 * **Much shorter and concise operations** All the usual operands are grabbed at the beginning, makes code _much_ shorter (most of the opcodes are one-liners), consistent, and less prone to error.
 
-* **Fixed a bunch of bugs** These will be explained on later in the soon-to-be extensive README/Wiki
+* **Fixed a bunch of bugs** The old version had some rampant bug issues that were hard to track down due to how it was written
