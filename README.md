@@ -1,7 +1,14 @@
 # ChocolateChip
 🍪 Round 2 With the CHIP-8 Emulator
 
-Almost finished, still has a few small bugs
+All roms I tested work
+
+Things left I want to do:
+
+- [ ] Make opcode selection more efficient
+- [ ] Finish up commands
+- [ ] Try and reduce flickering
+- [ ] Make a GUI
 
 # Some very useful resources:
 
