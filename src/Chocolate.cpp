@@ -283,8 +283,9 @@ void Chocolate::_8XY4(){
  * 
  */
 void Chocolate::_8XY5(){
-    V[X] -= V[Y];
     V[0xF]= (V[X] < V[Y]) ? 0:1;
+    V[X] -= V[Y];
+    
 }
 
 /**
@@ -477,8 +478,6 @@ void Chocolate::_FX55(){
  * is increased by 1 for each value written, but I itself is left unmodified 
  * 
  */
-
-
 void Chocolate::_FX65(){
     for(int i = 0; i <= X; i++){
         V[i] = memory[I+i];
