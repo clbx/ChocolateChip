@@ -3,13 +3,6 @@
 
 All roms I tested work
 
-Things left I want to do:
-
-- [ ] Make opcode selection more efficient
-- [ ] Finish up commands
-- [ ] Try and reduce flickering
-- [ ] Make a GUI
-
 # Some very useful resources:
 
 [Chip 8's Wikipedia Page](https://en.wikipedia.org/wiki/CHIP-8)
