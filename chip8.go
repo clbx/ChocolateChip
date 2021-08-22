@@ -24,7 +24,7 @@ func (c *chip8) Reset() {
 	c.memory = [0xFFF]uint8{}
 	c.v, c.stack = [0xF]uint8{}, [0xF]uint16{}
 	c.video = [64 * 32]bool{}
-	c.i, c.sp, c.delay, c.sound, c.NNN, c.NN, c.N, c.X, c.Y = 0, 0, 0, 0, 0, 0, 0, 0, 0
+	c.i, c.sp, c.delay, c.sound = 0, 0, 0, 0
 	c.pc = 0x200
 }
 
@@ -33,11 +33,15 @@ func (c *chip8) Cycle() {
 	//Fetch
 	var op uint16 = uint16(c.memory[c.pc])<<8 | uint16(c.memory[c.pc+1])
 
-	var NNN uint16 = op & 0x0FFF
-	var KK uint8 = uint8(op & 0x00FF)
-	var N uint8 = uint8(op & 0x000F)
-	var X uint8 = uint8((op & 0x0F00) >> 8)
-	var Y uint8 = uint8((op & 0x00F0) >> 4)
+	//Get the common operands
+	var nnn uint16 = op & 0x0FFF
+	var kk uint8 = uint8(op & 0x00FF)
+	var n uint8 = uint8(op & 0x000F)
+	var x uint8 = uint8((op & 0x0F00) >> 8)
+	var y uint8 = uint8((op & 0x00F0) >> 4)
+
+	//How much to change the program counter by
+	var pcDelta = 1
 
 	//Decode & Execute
 	switch op & 0xF000 {
@@ -52,34 +56,56 @@ func (c *chip8) Cycle() {
 		}
 	// 1NNN JP addr - Jump to location NNN
 	case 0x1000:
-		c.pc = NNN
+		c.pc = nnn
+		pcDelta = 0
 
 	// 2NNN CALL addr - Call subroutine at NNN
 	case 0x2000:
 		c.pc++
 		c.push(c.pc)
-		c.pc = NNN
-	// 3XKK SE Vx, byte - Skip next instruction if Vx != kk
+		c.pc = nnn
+	// 3XKK SE Vx, byte - Skip next instruction if V[x] == kk
 	case 0x3000:
-
+		if c.v[x] == kk {
+			pcDelta = 2 //Skip 2 instructions
+		}
+	// 4XKK SNE Vx, byte - Skip next instruction if V[x] != kk
 	case 0x4000:
-		fmt.Printf("Opcode not implemented")
+		if c.v[x] != kk {
+			pcDelta = 2
+		}
+	// 5xy0 SE Vx, Vy - Skip next instruction if V[x] = V[y]
 	case 0x5000:
-		fmt.Printf("Opcode not implemented")
+		if c.v[x] == c.v[y] {
+			pcDelta = 2
+		}
+	// 6xkk LD Vx - byte Sets V[x] to kk
 	case 0x6000:
-		fmt.Printf("Opcode not implemented")
+		c.v[x] = kk
+	// 7xkk ADD Vx - byte Set Vx = Vx + kk
 	case 0x7000:
-		fmt.Printf("Opcode not implemented")
+		c.v[x] = c.v[x] + kk
 	case 0x8000:
 		switch op & 0x000F {
+		//8xy0 LD Vx, Vy - Stores the value of V[y] in V[x]
+		case 0x0000:
+			c.v[x] = c.v[y]
+		//8xy1 OR Vx, Vy - Set V[x] = V[x] AND V[y]
 		case 0x0001:
-			fmt.Printf("Opcode not implemented")
+			c.v[x] = c.v[x] | c.v[y]
+		//8xy2 AND Vx, Vy - Set V[x] = V[x] OR V[y]
 		case 0x0002:
-			fmt.Printf("Opcode not implemented")
+			c.v[x] = c.v[x] & c.v[y]
+		//8xy3 XOR Vx, Vy - Set V[x] = V[x] XOR V[y]
 		case 0x0003:
-			fmt.Printf("Opcode not implemented")
+			c.v[x] = c.v[x] ^ c.v[y]
+		//8xy4 ADD Vx, Vy. Set Vx = Vx + Vy set V[F] = carry
 		case 0x0004:
-			fmt.Printf("Opcode not implemented")
+			c.v[x] = c.v[x] + c.v[y]
+			if c.v[y] > (0xFF - c.v[x]) {
+				c.v[0xF-1] = 1
+			}
+
 		case 0x0005:
 			fmt.Printf("Opcode not implemented")
 		case 0x0006:
