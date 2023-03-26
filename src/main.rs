@@ -3,5 +3,5 @@
 
 fn main() {
     let mut cpu = Chocolate::new();
-    cpu.tick();
+    cpu.tick(true);
 }
