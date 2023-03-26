@@ -38,3 +38,8 @@ res/
 
 chocolate
 tests
+
+
+# Added by cargo
+
+/target
